@@ -1748,7 +1748,7 @@
           целей, денег, здоровья и новой версии жизни.
         </p>
         <div class="hero-stats" aria-label="Ключевые возможности дневника">
-          <div><b>7</b><span>разделов роста</span></div>
+          <div><b>8</b><span>разделов роста</span></div>
           <div><b>∞</b><span>автосохранение</span></div>
           <div><b>PDF</b><span>печать и архив</span></div>
         </div>
@@ -1889,7 +1889,7 @@
     const DRAFT_KEY = 'irina_success_diary_draft_v2';
     const COLOR_KEY = 'irina_success_diary_color_v2';
     const MODE_KEY = 'irina_success_diary_mode_v2';
-    const CLEAN_TEMPLATE_KEY = 'success_diary_clean_template_v1';
+    const CLEAN_TEMPLATE_KEY = 'success_diary_clean_template_v2';
 
     /* Следующий раздел для всплывающего окна «Продолжить» */
     let pendingNextSectionId = null;
@@ -1927,6 +1927,139 @@
               { t: 'Как я себя после этого чувствую?', id: 'feelings', type: 'check', options: ['спокойно', 'легче', 'радостно', 'увереннее', 'теплее к себе', 'свободнее', 'устала, но довольна'], hint: 'Отметь подходящее. Если чувства другие — допиши ниже.' },
               { t: 'Другое чувство', id: 'customFeeling', type: 'input', hint: 'Например: «горжусь собой», «пока тревожно, но я стараюсь».' },
               { t: 'Что я хочу сделать для себя завтра?', id: 'tomorrowCare', type: 'textarea', hint: 'Один заботливый шаг на завтра. Реальный, не героический.' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'consciousness',
+        title: 'Сознание',
+        intro: 'Ежедневная система осознанности: внимание, интуиция, страхи, убеждения, энергия и практика присутствия.',
+        help: 'Глубокий блок работы с сознанием: от состояния дня до перепрограммирования убеждений и будущей версии себя.',
+        blocks: [
+          {
+            title: 'Начало дня: состояние творения',
+            qs: [
+              { t: 'Из какого состояния я сегодня создаю свою жизнь?', id: 'creationStateMorning', type: 'select', options: ['страх', 'контроль', 'усталость', 'ясность', 'любовь', 'тишина', 'присутствие'], hint: 'Это стартовая точка дня. Не оценивай себя, просто честно выбери состояние.' },
+              { t: 'Какое состояние я выбираю усилить сегодня?', id: 'creationStateChosen', type: 'select', options: ['ясность', 'любовь', 'тишина', 'присутствие', 'доверие', 'спокойствие', 'сила'], hint: 'Выбери внутреннюю частоту, к которой хочешь возвращаться в течение дня.' },
+              { t: 'Что поможет мне вернуться в это состояние?', id: 'creationAnchor', type: 'textarea', hint: 'Например: дыхание, пауза, вода, прогулка, молитва, тишина, один ясный шаг.' }
+            ]
+          },
+          {
+            title: '1. Состояние сознания сегодня',
+            qs: [
+              { t: 'В каком я состоянии сегодня?', id: 'consciousnessState', type: 'select', options: ['ясное', 'сфокусированное', 'отвлечённое', 'уставшее', 'сумасшедшее'], hint: 'Выбери самое близкое состояние без попытки выглядеть правильно.' },
+              { t: 'Где я находилась чаще всего?', id: 'attentionPlace', type: 'select', options: ['в настоящем', 'в мыслях', 'в тревоге', 'в фокусе', 'в прошлом', 'в будущем'], hint: 'Это показывает, где сегодня жило внимание.' },
+              { t: 'Сколько раз я теряла внимание и возвращалась в момент?', id: 'attentionReturnCount', type: 'input', placeholder: 'Например: 3 раза, 10 раз, много раз' }
+            ]
+          },
+          {
+            title: '2. Состояние творения',
+            qs: [
+              { t: 'Из какого состояния я сегодня реально создавала свою жизнь?', id: 'creationStateActual', type: 'select', options: ['страх', 'контроль', 'усталость', 'ясность', 'любовь', 'тишина', 'присутствие'], hint: 'Это итоговое наблюдение: из чего были решения, слова и действия.' },
+              { t: 'Где это состояние проявилось сильнее всего?', id: 'creationStateWhere', type: 'textarea' },
+              { t: 'Какое состояние я хочу выбрать завтра?', id: 'creationStateTomorrow', type: 'select', options: ['ясность', 'любовь', 'тишина', 'присутствие', 'доверие', 'спокойствие', 'сила'] }
+            ]
+          },
+          {
+            title: '3. Ясность намерения',
+            qs: [
+              { t: 'Главное намерение дня', id: 'mainIntention', type: 'textarea', hint: 'Сформулируй намерение не как задачу, а как внутреннее направление.' },
+              { t: 'Это желание из эго, ясности или сомнения?', id: 'intentionSource', type: 'select', options: ['эго', 'ясность', 'сомнение', 'страх', 'любовь', 'неясно'], hint: 'Можно выбрать неидеальный ответ. Важно увидеть источник.' },
+              { t: 'Ощущение тела на это намерение', id: 'bodyYesNo', type: 'select', options: ['да', 'нет', 'неясно'], hint: 'Тело расширяется, сжимается или пока молчит?' },
+              { t: 'Что тело подсказывает об этом намерении?', id: 'bodyIntentionSignal', type: 'textarea' }
+            ]
+          },
+          {
+            title: '4. Внутренний учитель: интуиция',
+            qs: [
+              { t: 'Вопрос дня', id: 'intuitionQuestion', type: 'textarea', hint: 'Задай один честный вопрос внутреннему учителю.' },
+              { t: 'Ответ тела', id: 'bodyAnswer', type: 'select', options: ['лёгкость', 'тяжесть', 'нейтрально'], hint: 'Сначала ответ тела, потом логика.' },
+              { t: 'Интуитивный ответ', id: 'intuitiveAnswer', type: 'textareaBig', hint: 'Пиши первое, что приходит, без редактирования.' },
+              { t: 'Я доверяю этому ответу?', id: 'trustIntuition', type: 'select', options: ['да', 'нет', 'частично', 'пока учусь доверять'] }
+            ]
+          },
+          {
+            title: '5. Ментальный детокс: о чём я думаю сейчас',
+            qs: [
+              { t: 'О чём я думала чаще всего сегодня?', id: 'mainThoughtsToday', type: 'textareaBig' },
+              { t: 'Какие мысли повторялись по кругу?', id: 'loopThoughts', type: 'textareaBig', hint: 'Запиши повторяющиеся фразы, сценарии или внутренние споры.' },
+              { t: 'Какие мысли были фоновыми?', id: 'backgroundThoughts', type: 'check', options: ['страхи', 'тревога', 'прошлое', 'будущее', 'сравнение', 'сомнения'], hint: 'Можно выбрать несколько фоновых тем.' },
+              { t: 'Сколько времени я была в мыслях, а не в реальности?', id: 'timeInThoughts', type: 'input', placeholder: 'Например: 30 минут, полдня, большую часть дня' },
+              { t: 'Какие мысли я остановила осознанно?', id: 'stoppedThoughts', type: 'textarea' },
+              { t: 'Какие мысли я выбрала вместо автоматических?', id: 'chosenThoughts', type: 'textareaBig' },
+              { t: 'Были ли моменты внутренней тишины?', id: 'innerSilenceMoments', type: 'select', options: ['да', 'нет', 'короткие моменты', 'несколько раз'] },
+              { t: 'Какие мысли забирали энергию?', id: 'energyDrainingThoughts', type: 'textarea' },
+              { t: 'Какие мысли давали энергию?', id: 'energyGivingThoughts', type: 'textarea' },
+              { t: 'Главный мыслительный паттерн дня', id: 'mainMentalPattern', type: 'textarea', hint: 'Например: контроль, ожидание худшего, сравнение, обесценивание, доверие, благодарность.' },
+              { t: 'Что я хочу перестать крутить в голове?', id: 'stopRuminating', type: 'textarea' },
+              { t: 'Какая мысль сегодня меня изменила?', id: 'transformingThought', type: 'textarea' }
+            ]
+          },
+          {
+            title: '6. Страхи и сопротивление',
+            qs: [
+              { t: 'Какой страх проявился сегодня?', id: 'fearToday', type: 'textarea' },
+              { t: 'Это страх потери или страх будущего?', id: 'fearType', type: 'select', options: ['страх потери', 'страх будущего', 'оба', 'неясно'], hint: 'Страх потери держит старое. Страх будущего не пускает в новое.' },
+              { t: 'Как я на него отреагировала?', id: 'fearReaction', type: 'textarea' },
+              { t: 'Что страх пытался защитить?', id: 'fearProtection', type: 'textarea' },
+              { t: 'Какой взрослый ответ я выбираю вместо реакции страха?', id: 'adultFearResponse', type: 'textarea' }
+            ]
+          },
+          {
+            title: '7. Убеждения и перепрограммирование',
+            qs: [
+              { t: 'Какие ограничивающие убеждения проявились сегодня?', id: 'beliefsToday', type: 'textareaBig', hint: 'Можно писать списком: убеждение 1, убеждение 2, убеждение 3.' },
+              { t: 'Чьи это убеждения?', id: 'beliefsSource', type: 'check', options: ['мои', 'родители', 'социум', 'окружение'], hint: 'Иногда убеждение унаследовано, а не выбрано.' },
+              { t: 'Переписать каждое убеждение в форму энергии и ресурса', id: 'beliefsReframe', type: 'textareaBig', placeholder: 'Было: ... Теперь я выбираю: ... Новый ресурс: ...' },
+              { t: 'Какое новое убеждение я выбираю закрепить сегодня?', id: 'newBeliefToday', type: 'textarea' }
+            ]
+          },
+          {
+            title: '8. Фокус внимания',
+            qs: [
+              { t: 'Что меня отвлекало сегодня?', id: 'distractionsToday', type: 'textarea' },
+              { t: 'Сколько раз я теряла концентрацию?', id: 'focusLostCount', type: 'input', placeholder: 'Например: 5 раз, постоянно, редко' },
+              { t: 'Что возвращало меня в фокус?', id: 'focusReturnTools', type: 'textarea' },
+              { t: 'Где моё внимание было самым сильным?', id: 'strongestFocusPlace', type: 'textarea' }
+            ]
+          },
+          {
+            title: '9. Энергия дня',
+            qs: [
+              { t: 'Уровень энергии от 1 до 10', id: 'consciousEnergyScore', type: 'scale', hint: '1 — почти нет сил, 10 — высокий ресурс и ясность.' },
+              { t: 'Что дало энергию?', id: 'energySources', type: 'textarea' },
+              { t: 'Что забрало энергию?', id: 'energyLeaks', type: 'textarea' },
+              { t: 'Что я могу сделать завтра, чтобы сохранить энергию?', id: 'energyTomorrowStep', type: 'textarea' }
+            ]
+          },
+          {
+            title: '10. Практики дня',
+            qs: [
+              { t: 'Медитация', id: 'practiceMeditation', type: 'select', options: ['да', 'нет'] },
+              { t: 'Пранаяма', id: 'practicePranayama', type: 'select', options: ['да', 'нет'] },
+              { t: 'Письмо энергии', id: 'practiceEnergyWriting', type: 'select', options: ['да', 'нет'] },
+              { t: 'Благодарности', id: 'practiceGratitude', type: 'select', options: ['да', 'нет'] },
+              { t: 'Какая практика сильнее всего изменила состояние?', id: 'strongestPractice', type: 'textarea' },
+              { t: 'Что я заметила после практики?', id: 'practiceInsight', type: 'textarea' }
+            ]
+          },
+          {
+            title: '11. 7 событий и 14 благодарностей',
+            qs: [
+              { t: '7 событий дня', id: 'sevenEvents', type: 'textareaBig', placeholder: '1. ... 2. ... 3. ... 4. ... 5. ... 6. ... 7. ...' },
+              { t: '14 благодарностей', id: 'fourteenGratitudes', type: 'textareaBig', placeholder: '1. ... 2. ... 3. ... 4. ... 5. ... 6. ... 7. ... 8. ... 9. ... 10. ... 11. ... 12. ... 13. ... 14. ...' },
+              { t: 'Самое сильное событие дня', id: 'strongestEvent', type: 'textarea' },
+              { t: 'Главная благодарность себе', id: 'mainSelfGratitude', type: 'textarea' }
+            ]
+          },
+          {
+            title: '12. Будущая версия меня',
+            qs: [
+              { t: 'Как бы действовала моя лучшая версия 4–5 уровня сознания?', id: 'futureSelfAction45', type: 'textareaBig', hint: 'Опиши действия, слова, внутреннюю позицию и выбор.' },
+              { t: 'Действовала ли я сегодня как она?', id: 'actedAsFutureSelf', type: 'select', options: ['да', 'нет', 'частично'] },
+              { t: 'Где я вышла из этого состояния?', id: 'leftFutureSelfState', type: 'textarea' },
+              { t: 'Как я могу вернуться в это состояние завтра?', id: 'returnFutureSelfTomorrow', type: 'textarea' }
             ]
           }
         ]
@@ -2497,6 +2630,11 @@
         control = `<input id="${q.id}" placeholder="${q.placeholder || 'Напиши здесь...'}">`;
       } else if (q.type === 'date') {
         control = `<input id="${q.id}" type="date">`;
+      } else if (q.type === 'select') {
+        control = `<select id="${q.id}">
+          <option value="">Выбери вариант</option>
+          ${q.options.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('')}
+        </select>`;
       } else if (q.type === 'scale') {
         control = `<div class="scale" id="${q.id}">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n =>
           `<label><input type="radio" name="${q.id}" value="${n}"><span>${n}</span></label>`
