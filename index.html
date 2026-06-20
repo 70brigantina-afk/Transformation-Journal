@@ -1,54 +1,2876 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transformation Journal</title>
-  <link rel="stylesheet" href="styles.css">
-  <script>
-    (function () {
-      const saved = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = saved || (prefersDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-    })();
-  </script>
-</head>
-<body>
-  <div class="ambient ambient--one" aria-hidden="true"></div>
-  <div class="ambient ambient--two" aria-hidden="true"></div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Дневник успеха и трансформации</title>
 
-  <main class="journal">
-    <header class="journal__header">
-      <h1 class="journal__title">Transformation Journal</h1>
-      <p class="journal__subtitle">Записывайте мысли, отслеживайте изменения</p>
+  <!-- Шрифты -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;850;900&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===== CSS-переменные: светлая тема (базовые цвета) ===== */
+    :root {
+      --bg: #f4f6ef;
+      --card: #fff;
+      --text: #243024;
+      --muted: #71806f;
+      --accent: #7fa66a;
+      --accentDark: #5f854f;
+      --accent2: #d9c9a3;
+      --soft: #edf3e6;
+      --line: rgba(0, 0, 0, .09);
+      --danger: #b56b6b;
+      --shadow: 0 18px 45px rgba(50, 65, 45, .12);
+      --radius: 24px;
+      --overlay: rgba(20, 28, 18, .45);
+      --input-bg: rgba(255, 255, 255, .95);
+      --hero-bg: rgba(255, 255, 255, .86);
+      --nav-fade: linear-gradient(to bottom, var(--bg), rgba(255, 255, 255, 0));
+      --toolbar-bg: rgba(255, 255, 255, .9);
+    }
+
+    /* Акцентные палитры (светлый режим) */
+    [data-color="green"] {
+      --accent: #7fa66a;
+      --accentDark: #5f854f;
+      --accent2: #d9c9a3;
+      --soft: #edf3e6;
+      --shadow: 0 18px 45px rgba(50, 65, 45, .12);
+    }
+    [data-color="rose"] {
+      --bg: #fbf3f4;
+      --text: #35262a;
+      --muted: #8a6d75;
+      --accent: #c98793;
+      --accentDark: #aa6674;
+      --accent2: #e7c7a2;
+      --soft: #f8e7ea;
+      --shadow: 0 18px 45px rgba(105, 55, 65, .12);
+    }
+    [data-color="gold"] {
+      --bg: #fbf7eb;
+      --text: #342d20;
+      --muted: #83765f;
+      --accent: #b89555;
+      --accentDark: #98773f;
+      --accent2: #d9b66e;
+      --soft: #f4ecd7;
+      --shadow: 0 18px 45px rgba(103, 78, 31, .13);
+    }
+
+    /* ===== Тёмная тема: переопределение переменных ===== */
+    [data-mode="dark"] {
+      --bg: #141a14;
+      --card: #1e261e;
+      --text: #e8efe4;
+      --muted: #9aab96;
+      --soft: #263026;
+      --line: rgba(255, 255, 255, .1);
+      --shadow: 0 18px 45px rgba(0, 0, 0, .35);
+      --overlay: rgba(0, 0, 0, .62);
+      --input-bg: rgba(30, 38, 30, .95);
+      --hero-bg: rgba(30, 38, 30, .88);
+      --nav-fade: linear-gradient(to bottom, var(--bg), rgba(20, 26, 20, 0));
+      --toolbar-bg: rgba(30, 38, 30, .92);
+    }
+    [data-mode="dark"][data-color="green"] {
+      --accent: #8fb87a;
+      --accentDark: #a8d090;
+      --accent2: #4a5a42;
+    }
+    [data-mode="dark"][data-color="rose"] {
+      --bg: #1a1416;
+      --card: #261e21;
+      --text: #f0e6e8;
+      --muted: #b09aa0;
+      --accent: #d99aa6;
+      --accentDark: #e8b8c0;
+      --accent2: #5a4248;
+      --soft: #302428;
+      --hero-bg: rgba(38, 30, 33, .88);
+      --input-bg: rgba(38, 30, 33, .95);
+      --toolbar-bg: rgba(38, 30, 33, .92);
+    }
+    [data-mode="dark"][data-color="gold"] {
+      --bg: #18150f;
+      --card: #242018;
+      --text: #efe8dc;
+      --muted: #a89a82;
+      --accent: #c9a86a;
+      --accentDark: #dfc088;
+      --accent2: #4a4030;
+      --soft: #2c261c;
+      --hero-bg: rgba(36, 32, 24, .88);
+      --input-bg: rgba(36, 32, 24, .95);
+      --toolbar-bg: rgba(36, 32, 24, .92);
+    }
+
+    /* ===== Базовая вёрстка ===== */
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 25%, transparent), transparent 35%),
+        linear-gradient(135deg, var(--bg), color-mix(in srgb, var(--card) 60%, var(--bg)));
+      color: var(--text);
+      min-height: 100vh;
+      transition: background .45s ease, color .3s ease;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ===== Декоративный анимированный фон ===== */
+    .bg-decor {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: .35;
+      animation: float-orb 18s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 320px;
+      height: 320px;
+      top: -80px;
+      left: -60px;
+      background: color-mix(in srgb, var(--accent) 55%, transparent);
+      animation-duration: 22s;
+    }
+
+    .orb-2 {
+      width: 260px;
+      height: 260px;
+      top: 35%;
+      right: -70px;
+      background: color-mix(in srgb, var(--accent2) 70%, transparent);
+      animation-delay: -6s;
+      animation-duration: 26s;
+    }
+
+    .orb-3 {
+      width: 200px;
+      height: 200px;
+      bottom: 8%;
+      left: 28%;
+      background: color-mix(in srgb, var(--accent) 40%, var(--accent2));
+      animation-delay: -12s;
+      animation-duration: 20s;
+    }
+
+    @keyframes float-orb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(28px, -22px) scale(1.06); }
+      66% { transform: translate(-18px, 16px) scale(.94); }
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 100px;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1, h2, h3 {
+      font-family: "Cormorant Garamond", serif;
+      font-weight: 600;
+    }
+
+    /* ===== Анимация появления при загрузке ===== */
+    body:not(.loaded) .hero,
+    body:not(.loaded) .top-card,
+    body:not(.loaded) nav,
+    body:not(.loaded) .toolbar {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    body.loaded .hero { animation: rise-in .7s cubic-bezier(.22, 1, .36, 1) .05s both; }
+    body.loaded .top-card { animation: rise-in .7s cubic-bezier(.22, 1, .36, 1) .15s both; }
+    body.loaded nav { animation: rise-in .65s cubic-bezier(.22, 1, .36, 1) .25s both; }
+    body.loaded .toolbar { animation: rise-in .65s cubic-bezier(.22, 1, .36, 1) .35s both; }
+
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(22px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Шапка ===== */
+    header {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+
+    .hero, .card {
+      background: var(--hero-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid color-mix(in srgb, var(--card) 72%, var(--line));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: background .3s ease, border-color .3s ease, transform .25s ease, box-shadow .25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 50px color-mix(in srgb, var(--accent) 12%, rgba(0, 0, 0, .1));
+    }
+
+    .hero {
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      bottom: -80px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, var(--accent2), transparent 70%);
+      opacity: .45;
+      animation: pulse-glow 8s ease-in-out infinite;
+    }
+
+    .hero:before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      left: -30px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 40%, transparent), transparent 70%);
+      opacity: .5;
+      animation: pulse-glow 6s ease-in-out infinite reverse;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: .35; transform: scale(1); }
+      50% { opacity: .55; transform: scale(1.08); }
+    }
+
+    .hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--accentDark);
+      font-weight: 850;
+      font-size: 12px;
+      margin: 0 0 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 64px);
+      line-height: .95;
+      letter-spacing: -.05em;
+      text-align: center;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 25px;
+      letter-spacing: -.03em;
+    }
+
+    h3 {
+      margin: 22px 0 10px;
+      font-size: 18px;
+    }
+
+    .hero p {
+      max-width: 690px;
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .top-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .declaration {
+      padding: 18px;
+      background: linear-gradient(120deg, var(--soft), color-mix(in srgb, var(--accent) 8%, var(--soft)));
+      background-size: 200% 200%;
+      border-radius: 18px;
+      font-weight: 750;
+      line-height: 1.55;
+      animation: gradient-shift 10s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 8px 0 0;
+    }
+
+    .quote {
+      border-left: 5px solid var(--accent);
+      padding: 10px 0 10px 16px;
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.65;
+      background: linear-gradient(90deg, var(--soft), transparent);
+      border-radius: 0 14px 14px 0;
+    }
+
+    /* ===== Навигация по разделам ===== */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 10px 0 18px;
+      background: var(--nav-fade);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tab {
+      border: 0;
+      background: var(--card);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: 800;
+      transition: background .25s, color .25s, transform .2s ease, box-shadow .25s ease;
+    }
+
+    .tab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, .08);
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-1px) scale(1.03);
+      box-shadow: 0 10px 26px color-mix(in srgb, var(--accent) 40%, transparent);
+    }
+
+    /* ===== Разделы дневника ===== */
+    .section {
+      display: none;
+      animation: show .22s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section.section-enter .card {
+      animation: card-stagger .45s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    .section.section-enter .card:nth-child(1) { animation-delay: .04s; }
+    .section.section-enter .card:nth-child(2) { animation-delay: .08s; }
+    .section.section-enter .card:nth-child(3) { animation-delay: .12s; }
+    .section.section-enter .card:nth-child(4) { animation-delay: .16s; }
+    .section.section-enter .card:nth-child(5) { animation-delay: .20s; }
+    .section.section-enter .card:nth-child(n+6) { animation-delay: .24s; }
+
+    @keyframes card-stagger {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes show {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .question {
+      padding: 15px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .question:first-of-type {
+      border-top: 0;
+    }
+
+    .q-title {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      font-weight: 850;
+      margin-bottom: 7px;
+    }
+
+    .q-num {
+      display: inline-flex;
+      min-width: 27px;
+      height: 27px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--soft);
+      font-size: 13px;
+      color: var(--accentDark);
+      font-weight: 900;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .question:focus-within .q-num {
+      transform: scale(1.08);
+      background: color-mix(in srgb, var(--accent) 20%, var(--soft));
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 0 0 10px 36px;
+    }
+
+    .hint b { color: var(--text); }
+
+    /* Кнопка «подсказка» — открывает всплывающее окно */
+    .hint-btn {
+      border: 0;
+      background: var(--soft);
+      color: var(--accentDark);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .hint-btn:hover {
+      background: color-mix(in srgb, var(--accent) 20%, var(--soft));
+    }
+
+    /* Незаполненный вопрос — красная подсветка перед переходом дальше */
+    .question.unfilled {
+      background: color-mix(in srgb, var(--danger) 10%, transparent);
+      border: 2px solid var(--danger);
+      border-radius: 16px;
+      padding: 13px 12px;
+      margin-left: -4px;
+      margin-right: -4px;
+      animation: shake-unfilled .45s ease;
+    }
+
+    .question.unfilled .q-num {
+      background: color-mix(in srgb, var(--danger) 22%, var(--soft));
+      color: var(--danger);
+    }
+
+    .question.unfilled::before {
+      content: "Не заполнено";
+      display: block;
+      margin: 0 0 8px 36px;
+      font-size: 12px;
+      font-weight: 850;
+      color: var(--danger);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .question.unfilled textarea,
+    .question.unfilled input[type="text"],
+    .question.unfilled input[type="date"] {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 16%, transparent);
+    }
+
+    .question.unfilled .scale span {
+      border-color: color-mix(in srgb, var(--danger) 55%, var(--line));
+    }
+
+    .question.unfilled .checks,
+    .question.unfilled .choice {
+      outline: 2px solid var(--danger);
+      outline-offset: 5px;
+      border-radius: 14px;
+    }
+
+    @keyframes shake-unfilled {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    textarea, input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 13px 14px;
+      background: var(--input-bg);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, transform .2s ease;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+      transform: translateY(-1px);
+    }
+
+    textarea { min-height: 92px; resize: vertical; }
+    textarea.big { min-height: 150px; }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .scale {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+    }
+
+    .scale input { display: none; }
+
+    .scale span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .scale span:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+    }
+
+    .scale input:checked + span {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      animation: scale-pop .35s cubic-bezier(.34, 1.56, .64, 1);
+      box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
+    @keyframes scale-pop {
+      0% { transform: scale(.85); }
+      60% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 8px;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 12px;
+      background: color-mix(in srgb, var(--card) 75%, transparent);
+      cursor: pointer;
+      user-select: none;
+      font-weight: 650;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .check:hover {
+      transform: translateY(-1px);
+    }
+
+    .check:has(input:checked) {
+      background: color-mix(in srgb, var(--accent) 18%, var(--card));
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 22%, transparent);
+      animation: chip-select .3s ease;
+    }
+
+    @keyframes chip-select {
+      0% { transform: scale(.96); }
+      50% { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+    .check input { width: auto; accent-color: var(--accent); }
+
+    .choice {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .choice label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: var(--card);
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .choice label:hover {
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+    }
+
+    .choice label:has(input:checked) {
+      background: color-mix(in srgb, var(--accent) 14%, var(--card));
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+
+    .choice input { width: auto; accent-color: var(--accent); }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .primary, .secondary, .danger {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-weight: 850;
+      font-size: 15px;
+      transition: transform .18s ease, box-shadow .2s ease, filter .2s ease;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accentDark) 80%, var(--accent)));
+      color: #fff;
+      box-shadow: 0 12px 25px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
+    .primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+      box-shadow: 0 16px 30px color-mix(in srgb, var(--accent) 42%, transparent);
+    }
+
+    .primary:active {
+      transform: translateY(0) scale(.98);
+    }
+
+    .secondary:hover, .danger:hover {
+      transform: translateY(-1px);
+    }
+
+    .secondary:active, .danger:active {
+      transform: scale(.98);
+    }
+
+    .secondary {
+      background: var(--soft);
+      color: var(--text);
+    }
+
+    .danger {
+      background: color-mix(in srgb, var(--danger) 12%, var(--card));
+      color: var(--danger);
+    }
+
+    .mini { font-size: 12px; padding: 9px 12px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      background: var(--soft);
+      border-radius: 18px;
+      padding: 16px;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .stat:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px color-mix(in srgb, var(--accent) 10%, rgba(0, 0, 0, .08));
+    }
+
+    .stat b {
+      display: block;
+      font-size: 30px;
+      margin-bottom: 4px;
+      transition: color .3s ease;
+    }
+
+    .archive-item {
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--soft);
+      margin: 10px 0;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .archive-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 8%, rgba(0, 0, 0, .06));
+    }
+
+    .archive-item h3 { margin: 0 0 8px; }
+    .small { font-size: 13px; color: var(--muted); }
+    .hidden { display: none !important; }
+
+    /* ===== Нижняя панель инструментов ===== */
+    .toolbar {
+      position: sticky;
+      bottom: 12px;
+      z-index: 30;
+      background: var(--toolbar-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid color-mix(in srgb, var(--card) 80%, var(--line));
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress {
+      height: 9px;
+      background: var(--soft);
+      border-radius: 999px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .progress i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent2) 60%, var(--accent)));
+      transition: width .45s cubic-bezier(.22, 1, .36, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress i::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
+      transform: translateX(-100%);
+      animation: shimmer 2.2s ease-in-out infinite;
+    }
+
+    .progress.shimmer i::after {
+      animation-duration: 1.2s;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+
+    .status {
+      font-weight: 750;
+      color: var(--accentDark);
+      font-size: 13px;
+      min-width: 150px;
+      text-align: right;
+      transition: color .3s ease;
+    }
+
+    .status.saved-flash {
+      animation: status-flash .6s ease;
+    }
+
+    @keyframes status-flash {
+      0%, 100% { color: var(--accentDark); }
+      50% { color: var(--accent); transform: scale(1.03); }
+    }
+
+    .section-intro {
+      margin-top: -4px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .pill {
+      display: inline-block;
+      background: var(--soft);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-weight: 800;
+      color: var(--accentDark);
+      font-size: 13px;
+      margin: 3px 4px 3px 0;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .pill:hover {
+      transform: translateY(-1px);
+      background: color-mix(in srgb, var(--accent) 12%, var(--soft));
+    }
+
+    /* ===== Футер раздела: прогресс и переход к следующей странице ===== */
+    .section-footer {
+      margin-top: 4px;
+      border: 2px solid color-mix(in srgb, var(--accent) 25%, var(--line));
+    }
+
+    .section-footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .section-footer-label {
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--accentDark);
+    }
+
+    .section-footer-pct {
+      font-weight: 900;
+      font-size: 14px;
+      color: var(--accentDark);
+    }
+
+    .section-footer-bar {
+      height: 8px;
+      background: var(--soft);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .section-footer-bar i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent2) 50%, var(--accent)));
+      transition: width .45s cubic-bezier(.22, 1, .36, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-footer-bar i::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .3), transparent);
+      animation: shimmer 2.5s ease-in-out infinite;
+    }
+
+    .section-footer-note {
+      margin: 0 0 14px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .section-footer-actions {
+      margin-top: 0;
+    }
+
+    .section-continue-btn:not(:disabled) {
+      box-shadow: 0 12px 25px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+
+    .section-continue-btn.attention {
+      animation: pulse-btn 1s ease infinite;
+    }
+
+    @keyframes pulse-btn {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .section-footer.complete {
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+      background: color-mix(in srgb, var(--accent) 6%, var(--card));
+      animation: complete-glow 1.2s ease;
+    }
+
+    @keyframes complete-glow {
+      0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent); }
+      50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 18%, transparent); }
+      100% { box-shadow: none; }
+    }
+
+    /* ===== Кнопка переключения светлой / тёмной темы (правый нижний угол) ===== */
+    .theme-toggle {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 50;
+      width: 54px;
+      height: 54px;
+      border: 1px solid color-mix(in srgb, var(--card) 80%, var(--line));
+      border-radius: 50%;
+      background: var(--toolbar-bg);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: transform .2s ease, background .3s ease;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.06) rotate(8deg);
+    }
+
+    .theme-toggle.spin {
+      animation: theme-spin .55s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    @keyframes theme-spin {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(180deg) scale(1.08); }
+    }
+
+    .theme-toggle:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent);
+      outline-offset: 3px;
+    }
+
+    /* ===== Всплывающие окна (модальные) ===== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--overlay);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-backdrop.open .modal {
+      animation: modal-in .4s cubic-bezier(.22, 1, .36, 1) both;
+    }
+
+    @keyframes modal-in {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(.94);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal {
+      width: min(520px, 100%);
+      max-height: min(85vh, 640px);
+      overflow: auto;
+      background: var(--card);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--line);
+      padding: 26px;
+      transform: translateY(12px) scale(.98);
+      transition: transform .25s ease;
+    }
+
+    .modal-backdrop.open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal h2 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+
+    .modal p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0 0 14px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      border: 0;
+      background: var(--soft);
+      color: var(--text);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .modal-wrap {
+      position: relative;
+    }
+
+    /* Карточки разделов в справке */
+    .help-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .help-item {
+      background: var(--soft);
+      border-radius: 14px;
+      padding: 12px 14px;
+      transition: transform .2s ease, background .2s ease;
+    }
+
+    .help-item:hover {
+      transform: translateX(4px);
+      background: color-mix(in srgb, var(--accent) 10%, var(--soft));
+    }
+
+    .help-item b {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .help-item span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 860px) {
+      header, .grid, .row, .choice { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .hero { padding: 24px; }
+      .scale { grid-template-columns: repeat(5, 1fr); }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .status { text-align: left; }
+      .theme-toggle { right: 14px; bottom: 14px; }
+      .wrap { padding-bottom: 110px; }
+    }
+
+    /* Уважение к настройке «уменьшить движение» */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+      .orb { display: none; }
+    }
+
+    /* ===== REDESIGN: современный интерфейс поверх данных дневника ===== */
+    :root {
+      --bg: #f6f0e7;
+      --card: rgba(255, 252, 246, .78);
+      --text: #251f19;
+      --muted: #7d7064;
+      --accent: #9a7651;
+      --accentDark: #6f5237;
+      --accent2: #e6c8a0;
+      --soft: rgba(154, 118, 81, .1);
+      --line: rgba(65, 46, 30, .13);
+      --danger: #b75f5f;
+      --shadow: 0 24px 70px rgba(67, 45, 25, .14);
+      --radius: 30px;
+      --overlay: rgba(28, 20, 14, .48);
+      --input-bg: rgba(255, 252, 246, .9);
+      --hero-bg: rgba(255, 252, 246, .72);
+      --nav-fade: linear-gradient(to bottom, rgba(246, 240, 231, .96), rgba(246, 240, 231, .72), transparent);
+      --toolbar-bg: rgba(255, 252, 246, .84);
+    }
+
+    [data-color="green"] {
+      --bg: #f2f5eb;
+      --text: #202a1f;
+      --muted: #66745f;
+      --accent: #6f945d;
+      --accentDark: #4f733f;
+      --accent2: #d7c79c;
+      --soft: rgba(111, 148, 93, .12);
+      --shadow: 0 24px 70px rgba(38, 62, 34, .14);
+      --nav-fade: linear-gradient(to bottom, rgba(242, 245, 235, .96), rgba(242, 245, 235, .72), transparent);
+    }
+
+    [data-color="rose"] {
+      --bg: #fbf0f2;
+      --text: #342227;
+      --muted: #876771;
+      --accent: #c8798a;
+      --accentDark: #9f5667;
+      --accent2: #ecc3a4;
+      --soft: rgba(200, 121, 138, .12);
+      --shadow: 0 24px 70px rgba(104, 46, 62, .14);
+      --nav-fade: linear-gradient(to bottom, rgba(251, 240, 242, .96), rgba(251, 240, 242, .72), transparent);
+    }
+
+    [data-color="gold"] {
+      --bg: #fbf5e6;
+      --text: #332819;
+      --muted: #817057;
+      --accent: #b68d42;
+      --accentDark: #8c682e;
+      --accent2: #f0cc83;
+      --soft: rgba(182, 141, 66, .13);
+      --shadow: 0 24px 70px rgba(104, 75, 24, .14);
+      --nav-fade: linear-gradient(to bottom, rgba(251, 245, 230, .96), rgba(251, 245, 230, .72), transparent);
+    }
+
+    [data-mode="dark"] {
+      --bg: #111411;
+      --card: rgba(27, 32, 27, .76);
+      --text: #f1efe8;
+      --muted: #aaa79d;
+      --line: rgba(255, 255, 255, .12);
+      --soft: rgba(255, 255, 255, .07);
+      --shadow: 0 24px 80px rgba(0, 0, 0, .42);
+      --overlay: rgba(0, 0, 0, .64);
+      --input-bg: rgba(24, 29, 24, .92);
+      --hero-bg: rgba(27, 32, 27, .72);
+      --nav-fade: linear-gradient(to bottom, rgba(17, 20, 17, .96), rgba(17, 20, 17, .72), transparent);
+      --toolbar-bg: rgba(27, 32, 27, .84);
+    }
+
+    [data-mode="dark"][data-color="green"] {
+      --bg: #101610;
+      --card: rgba(26, 34, 26, .76);
+      --text: #eef3e9;
+      --muted: #a6b2a0;
+      --accent: #8fbd78;
+      --accentDark: #b5df9d;
+      --accent2: #516941;
+      --soft: rgba(143, 189, 120, .1);
+      --input-bg: rgba(26, 34, 26, .92);
+      --toolbar-bg: rgba(26, 34, 26, .84);
+      --nav-fade: linear-gradient(to bottom, rgba(16, 22, 16, .96), rgba(16, 22, 16, .72), transparent);
+    }
+
+    [data-mode="dark"][data-color="rose"] {
+      --bg: #171113;
+      --card: rgba(34, 24, 28, .76);
+      --text: #f4e9ec;
+      --muted: #baa4ab;
+      --accent: #dc93a3;
+      --accentDark: #f0bfca;
+      --accent2: #64434b;
+      --soft: rgba(220, 147, 163, .1);
+      --input-bg: rgba(34, 24, 28, .92);
+      --toolbar-bg: rgba(34, 24, 28, .84);
+      --nav-fade: linear-gradient(to bottom, rgba(23, 17, 19, .96), rgba(23, 17, 19, .72), transparent);
+    }
+
+    [data-mode="dark"][data-color="gold"] {
+      --bg: #17130c;
+      --card: rgba(35, 29, 18, .76);
+      --text: #f4ead9;
+      --muted: #b2a38b;
+      --accent: #d0a85b;
+      --accentDark: #f0cb82;
+      --accent2: #5c4526;
+      --soft: rgba(208, 168, 91, .1);
+      --input-bg: rgba(35, 29, 18, .92);
+      --toolbar-bg: rgba(35, 29, 18, .84);
+      --nav-fade: linear-gradient(to bottom, rgba(23, 19, 12, .96), rgba(23, 19, 12, .72), transparent);
+    }
+
+    body {
+      background:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px),
+        radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 34rem),
+        radial-gradient(circle at 90% 20%, color-mix(in srgb, var(--accent2) 36%, transparent), transparent 32rem),
+        radial-gradient(circle at 45% 90%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 38rem),
+        var(--bg);
+      background-size: 42px 42px, 42px 42px, auto, auto, auto, auto;
+    }
+
+    .bg-decor {
+      opacity: .9;
+      mix-blend-mode: multiply;
+    }
+
+    [data-mode="dark"] .bg-decor {
+      mix-blend-mode: screen;
+      opacity: .65;
+    }
+
+    .orb {
+      filter: blur(76px);
+      opacity: .48;
+    }
+
+    .wrap {
+      width: min(1220px, calc(100% - 36px));
+      padding: 34px 0 120px;
+    }
+
+    header {
+      grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+
+    .hero,
+    .card,
+    .modal,
+    .toolbar,
+    .theme-toggle {
+      border: 1px solid color-mix(in srgb, var(--card) 64%, var(--line));
+      background:
+        linear-gradient(145deg, color-mix(in srgb, var(--card) 92%, white 8%), color-mix(in srgb, var(--card) 88%, transparent)),
+        var(--card);
+      backdrop-filter: blur(22px) saturate(120%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      min-height: 430px;
+      padding: clamp(28px, 5vw, 56px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      isolation: isolate;
+    }
+
+    .hero::before {
+      width: 360px;
+      height: 360px;
+      top: auto;
+      left: auto;
+      right: -110px;
+      bottom: -130px;
+      background:
+        radial-gradient(circle, color-mix(in srgb, var(--accent) 38%, transparent), transparent 64%),
+        conic-gradient(from 120deg, transparent, color-mix(in srgb, var(--accent2) 45%, transparent), transparent);
+      opacity: .8;
+    }
+
+    .hero::after {
+      inset: 18px;
+      width: auto;
+      height: auto;
+      border-radius: 24px;
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--accent) 26%, transparent), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, .22), transparent 52%);
+      opacity: .55;
+      animation: none;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      padding: 8px 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      color: var(--accentDark);
+      letter-spacing: .12em;
+      font-size: 11px;
+    }
+
+    h1 {
+      max-width: 820px;
+      margin-top: 18px;
+      text-align: left;
+      font-size: clamp(46px, 8vw, 92px);
+      line-height: .88;
+      letter-spacing: -.07em;
+      background: linear-gradient(125deg, var(--text), var(--accentDark) 45%, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    h2 {
+      font-size: clamp(27px, 3.5vw, 42px);
+      line-height: 1;
+      letter-spacing: -.055em;
+    }
+
+    .hero p {
+      max-width: 640px;
+      font-size: clamp(16px, 2vw, 20px);
+      color: color-mix(in srgb, var(--text) 64%, var(--muted));
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 28px;
+      max-width: 620px;
+    }
+
+    .hero-stats div {
+      padding: 16px;
+      border-radius: 20px;
+      background: color-mix(in srgb, var(--card) 58%, var(--soft));
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--line));
+    }
+
+    .hero-stats b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 24px;
+      color: var(--accentDark);
+    }
+
+    .hero-stats span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .top-card {
+      padding: 26px;
+      border-radius: var(--radius);
+    }
+
+    .declaration {
+      padding: 22px;
+      border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+      border-radius: 24px;
+      background:
+        linear-gradient(145deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent),
+        color-mix(in srgb, var(--card) 72%, var(--soft));
+      font-size: 18px;
+    }
+
+    .top-card__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .top-card__list span,
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line));
+      background: color-mix(in srgb, var(--accent) 9%, transparent);
+      color: var(--accentDark);
+    }
+
+    nav {
+      top: 0;
+      padding: 12px 0 20px;
+    }
+
+    .tabs {
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid color-mix(in srgb, var(--card) 60%, var(--line));
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--toolbar-bg) 88%, transparent);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 16px 42px rgba(0, 0, 0, .08);
+    }
+
+    .tab {
+      flex: 0 0 auto;
+      padding: 11px 15px;
+      border: 1px solid transparent;
+      background: transparent;
+      box-shadow: none;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tab:hover {
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      box-shadow: none;
+    }
+
+    .tab.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+      box-shadow: 0 10px 28px color-mix(in srgb, var(--text) 18%, transparent);
+    }
+
+    .section-cover {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 18px;
+      padding: 30px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .section-cover::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -90px;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 68%);
+      pointer-events: none;
+    }
+
+    .section-cover > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-meta {
+      display: grid;
+      gap: 8px;
+      min-width: 230px;
+    }
+
+    .section-meta span {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 17%, var(--line));
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--card) 62%, var(--soft));
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .section-meta b {
+      color: var(--accentDark);
+    }
+
+    .card {
+      padding: clamp(20px, 3vw, 30px);
+      margin-bottom: 16px;
+      border-radius: var(--radius);
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 28px 76px color-mix(in srgb, var(--accent) 15%, rgba(0, 0, 0, .12));
+    }
+
+    .question {
+      margin-top: 12px;
+      padding: 16px;
+      border: 1px solid color-mix(in srgb, var(--accent) 10%, var(--line));
+      border-radius: 22px;
+      background: color-mix(in srgb, var(--card) 58%, transparent);
+    }
+
+    .question:first-of-type {
+      border-top: 1px solid color-mix(in srgb, var(--accent) 10%, var(--line));
+    }
+
+    .question:focus-within {
+      border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+      box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 12%, transparent);
+      transform: translateY(-1px);
+    }
+
+    .q-title {
+      gap: 12px;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    .q-num {
+      min-width: 34px;
+      height: 34px;
+      border-radius: 13px;
+      background: var(--text);
+      color: var(--bg);
+      box-shadow: 0 8px 18px color-mix(in srgb, var(--text) 14%, transparent);
+    }
+
+    .hint {
+      margin-left: 46px;
+    }
+
+    .hint-btn {
+      padding: 5px 10px;
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line));
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+
+    textarea,
+    input,
+    select {
+      border-radius: 18px;
+      border-color: color-mix(in srgb, var(--accent) 13%, var(--line));
+      background: var(--input-bg);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent),
+        0 10px 24px color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+
+    .scale {
+      gap: 8px;
+    }
+
+    .scale span,
+    .choice label,
+    .check,
+    .archive-item,
+    .stat {
+      border-color: color-mix(in srgb, var(--accent) 13%, var(--line));
+      background: color-mix(in srgb, var(--card) 62%, var(--soft));
+    }
+
+    .scale span {
+      height: 44px;
+      border-radius: 15px;
+    }
+
+    .check,
+    .choice label {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .035);
+    }
+
+    .check:has(input:checked),
+    .choice label:has(input:checked),
+    .scale input:checked + span {
+      background: linear-gradient(135deg, var(--accent), var(--accentDark));
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .primary,
+    .secondary,
+    .danger {
+      border-radius: 999px;
+    }
+
+    .secondary {
+      border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--line));
+      background: color-mix(in srgb, var(--card) 62%, var(--soft));
+    }
+
+    .toolbar {
+      bottom: 18px;
+      border-radius: 999px;
+      padding: 10px 12px;
+      gap: 10px;
+    }
+
+    .progress {
+      height: 12px;
+      border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+      background: color-mix(in srgb, var(--text) 8%, transparent);
+    }
+
+    .progress i,
+    .section-footer-bar i {
+      background: linear-gradient(90deg, var(--accentDark), var(--accent), var(--accent2));
+    }
+
+    .theme-toggle {
+      right: 24px;
+      bottom: 92px;
+      width: 60px;
+      height: 60px;
+      border-radius: 22px;
+      font-size: 24px;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-4px) rotate(8deg) scale(1.04);
+    }
+
+    .modal-backdrop {
+      padding: 24px;
+    }
+
+    .modal {
+      border-radius: 28px;
+    }
+
+    .modal-close {
+      background: color-mix(in srgb, var(--accent) 11%, var(--card));
+    }
+
+    @media (max-width: 860px) {
+      .wrap {
+        width: min(100% - 24px, 1220px);
+        padding-top: 18px;
+      }
+
+      header,
+      .section-cover {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-stats,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .section-meta {
+        min-width: 0;
+      }
+
+      .tabs {
+        border-radius: 24px;
+      }
+
+      .toolbar {
+        border-radius: 26px;
+      }
+
+      .theme-toggle {
+        right: 14px;
+        bottom: 124px;
+      }
+    }
+
+    @media print {
+      nav, .actions, .toolbar, .no-print, .theme-toggle, .modal-backdrop { display: none !important; }
+      body { background: #fff; }
+      .card, .hero, .top-card { box-shadow: none; border: 1px solid #ddd; }
+      .section { display: block !important; page-break-after: always; }
+    }
+  </style>
+</head>
+
+<!-- data-color — акцентная палитра; data-mode — светлый или тёмный режим -->
+<body data-color="green" data-mode="light">
+
+  <!-- ===== Анимированный фон (декоративный) ===== -->
+  <div class="bg-decor no-print" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <!-- ==================== ОСНОВНОЙ КОНТЕЙНЕР ==================== -->
+  <div class="wrap">
+
+    <!-- ===== ШАПКА: заголовок и главная декларация ===== -->
+    <header>
+      <section class="hero">
+        <p class="eyebrow">Личный центр трансформации</p>
+        <h1>Дневник успеха и трансформации</h1>
+        <p>
+          Пространство для ежедневных решений, честных ответов, заботы о себе,
+          целей, денег, здоровья и новой версии жизни.
+        </p>
+        <div class="hero-stats" aria-label="Ключевые возможности дневника">
+          <div><b>7</b><span>разделов роста</span></div>
+          <div><b>∞</b><span>автосохранение</span></div>
+          <div><b>PDF</b><span>печать и архив</span></div>
+        </div>
+        <div class="actions no-print" style="margin-top:18px">
+          <!-- Кнопка открывает всплывающее окно со справкой по разделам -->
+          <button class="secondary mini" type="button" onclick="openModal('help')">Справка по разделам</button>
+        </div>
+      </section>
+
+      <aside class="top-card card">
+        <div>
+          <p class="eyebrow">Главная декларация</p>
+          <div class="declaration">
+            Я беру ответственность за свою жизнь. Я выбираю здоровье, достаток, развитие,
+            внутренний порядок и уважение к себе. Я сравниваю себя только с собой вчерашней.
+          </div>
+        </div>
+        <p class="note">
+          Маленькие шаги каждый день создают большую жизнь. Даже если шаг маленький — это всё равно движение,
+          а не заседание старой версии тебя в мягких тапочках.
+        </p>
+        <div class="top-card__list" aria-label="Фокусы дневника">
+          <span>осознанность</span>
+          <span>дисциплина</span>
+          <span>деньги</span>
+          <span>здоровье</span>
+        </div>
+      </aside>
     </header>
 
-    <section class="journal__entry">
-      <label class="journal__label" for="entry-text">Сегодня</label>
-      <textarea
-        id="entry-text"
-        class="journal__textarea"
-        placeholder="Что изменилось сегодня?"
-        rows="8"
-      ></textarea>
-    </section>
-  </main>
+    <!-- ===== НАВИГАЦИЯ: вкладки разделов (генерируются скриптом) ===== -->
+    <nav>
+      <div class="tabs" id="tabs"></div>
+    </nav>
 
+    <!-- ===== ОСНОВНОЕ СОДЕРЖИМОЕ: все разделы дневника ===== -->
+    <main id="app"></main>
+
+    <!-- ===== НИЖНЯЯ ПАНЕЛЬ: прогресс, статус сохранения, действия ===== -->
+    <div class="toolbar no-print">
+      <div class="progress"><i id="progressBar"></i></div>
+      <div class="status" id="saveStatus">Черновик готов</div>
+      <button class="primary mini" type="button" onclick="saveDay()">Сохранить день</button>
+      <button class="secondary mini" type="button" onclick="window.print()">PDF</button>
+    </div>
+  </div>
+
+  <!-- ===== КНОПКА ПЕРЕКЛЮЧЕНИЯ СВЕТЛОЙ / ТЁМНОЙ ТЕМЫ (правый нижний угол) ===== -->
   <button
-    class="theme-toggle"
-    id="theme-toggle"
+    class="theme-toggle no-print"
+    id="themeToggle"
     type="button"
-    aria-label="Переключить на тёмную тему"
-    title="Переключить тему"
-  >
-    <span class="theme-toggle__track" aria-hidden="true">
-      <span class="theme-toggle__thumb"></span>
-      <span class="theme-toggle__icon theme-toggle__icon--sun">☀️</span>
-      <span class="theme-toggle__icon theme-toggle__icon--moon">🌙</span>
-    </span>
-  </button>
+    title="Переключить светлую / тёмную тему"
+    aria-label="Переключить светлую или тёмную тему"
+    onclick="toggleDarkMode()"
+  >🌙</button>
 
-  <script src="app.js"></script>
+  <!-- ==================== ВСПЛЫВАЮЩИЕ ОКНА ==================== -->
+
+  <!-- Окно: справка по разделам -->
+  <div class="modal-backdrop" id="modal-help" role="dialog" aria-modal="true" aria-labelledby="modal-help-title">
+    <div class="modal modal-wrap">
+      <button class="modal-close" type="button" onclick="closeModal('help')" aria-label="Закрыть">×</button>
+      <h2 id="modal-help-title">Справка по разделам</h2>
+      <p>Дневник разбит на логические блоки. Черновик сохраняется автоматически, день — кнопкой «Сохранить день».</p>
+      <div class="help-grid" id="helpGrid"></div>
+      <div class="modal-actions">
+        <button class="primary" type="button" onclick="closeModal('help')">Понятно</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно: подсказка к вопросу (открывается по кнопке «?») -->
+  <div class="modal-backdrop" id="modal-hint" role="dialog" aria-modal="true" aria-labelledby="modal-hint-title">
+    <div class="modal modal-wrap">
+      <button class="modal-close" type="button" onclick="closeModal('hint')" aria-label="Закрыть">×</button>
+      <h2 id="modal-hint-title">Подсказка</h2>
+      <p id="modal-hint-text"></p>
+      <div class="modal-actions">
+        <button class="primary" type="button" onclick="closeModal('hint')">Спасибо</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно: подтверждение действия (вместо стандартного confirm) -->
+  <div class="modal-backdrop" id="modal-confirm" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title">
+    <div class="modal modal-wrap">
+      <h2 id="modal-confirm-title">Подтверждение</h2>
+      <p id="modal-confirm-text"></p>
+      <div class="modal-actions">
+        <button class="secondary" type="button" id="confirmCancel">Отмена</button>
+        <button class="danger" type="button" id="confirmOk">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно: уведомление (вместо alert) -->
+  <div class="modal-backdrop" id="modal-alert" role="dialog" aria-modal="true" aria-labelledby="modal-alert-title">
+    <div class="modal modal-wrap">
+      <h2 id="modal-alert-title">Сообщение</h2>
+      <p id="modal-alert-text"></p>
+      <div class="modal-actions">
+        <button class="primary" type="button" onclick="closeModal('alert')">Ок</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно: успешное сохранение дня -->
+  <div class="modal-backdrop" id="modal-saved" role="dialog" aria-modal="true" aria-labelledby="modal-saved-title">
+    <div class="modal modal-wrap">
+      <button class="modal-close" type="button" onclick="closeModal('saved')" aria-label="Закрыть">×</button>
+      <h2 id="modal-saved-title">День сохранён ✓</h2>
+      <p id="modal-saved-text">Запись добавлена в архив. Продолжай маленькими шагами — они складываются в большую жизнь.</p>
+      <div class="modal-actions">
+        <button class="secondary" type="button" onclick="closeModal('saved')">Продолжить</button>
+        <button class="primary" type="button" onclick="closeModal('saved'); switchTab('archive')">Открыть архив</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Окно: предложение перейти к следующему разделу (появляется при заполнении страницы) -->
+  <div class="modal-backdrop" id="modal-continue" role="dialog" aria-modal="true" aria-labelledby="modal-continue-title">
+    <div class="modal modal-wrap">
+      <button class="modal-close" type="button" onclick="closeModal('continue')" aria-label="Закрыть">×</button>
+      <h2 id="modal-continue-title">Раздел заполнен!</h2>
+      <p id="modal-continue-text">Отличная работа! Продолжить со следующим разделом?</p>
+      <div class="modal-actions">
+        <button class="secondary" type="button" onclick="closeModal('continue')">Остаться здесь</button>
+        <button class="primary" type="button" id="continueNextBtn" onclick="confirmContinueNext()">Продолжить →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== СКРИПТЫ ==================== -->
+  <script>
+    /* Ключи localStorage */
+    const STORE_KEY = 'irina_success_diary_v2';
+    const DRAFT_KEY = 'irina_success_diary_draft_v2';
+    const COLOR_KEY = 'irina_success_diary_color_v2';
+    const MODE_KEY = 'irina_success_diary_mode_v2';
+    const CLEAN_TEMPLATE_KEY = 'success_diary_clean_template_v1';
+
+    /* Следующий раздел для всплывающего окна «Продолжить» */
+    let pendingNextSectionId = null;
+    /* Разделы, для которых уже показано окно в этой сессии */
+    const shownContinuePopups = new Set();
+    /* Не показывать окно при первой загрузке черновика */
+    let suppressContinuePopup = true;
+
+    /* ===== Структура разделов дневника ===== */
+    const sections = [
+      {
+        id: 'today',
+        title: 'Сегодня',
+        intro: 'Короткая ежедневная запись: состояние, забота, один главный шаг.',
+        help: 'Ежедневный чек-ин: оцени состояние, выбери фокус дня и одно ключевое действие.',
+        blocks: [
+          {
+            title: 'Быстрая проверка состояния',
+            qs: [
+              { t: 'Дата записи', id: 'date', type: 'date', hint: 'Выбери день, за который заполняешь дневник.' },
+              { t: 'Моё состояние по шкале от 1 до 10', id: 'stateScore', type: 'scale', hint: '1 — совсем тяжело, 10 — спокойно, собранно и устойчиво.' },
+              { t: 'Мой уровень энергии', id: 'energyScore', type: 'scale', hint: 'Оцени не настроение, а заряд батарейки: сколько сил есть на день.' },
+              { t: 'Моё настроение', id: 'moodScore', type: 'scale', hint: '1 — мрачновато, 10 — радость и внутреннее солнце.' },
+              { t: 'Сегодня я выбираю проживать', id: 'values', type: 'check', options: ['спокойствие', 'благодарность', 'радость', 'смелость', 'уверенность', 'дисциплину', 'любовь', 'терпение', 'осознанность'], hint: 'Можно выбрать несколько качеств. Это не экзамен, это настройка внутреннего руля.' },
+              { t: 'Сегодня для меня самое важное', id: 'mostImportant', type: 'textarea', hint: 'Один главный фокус дня. Например: здоровье, клиент, порядок, семья, реклама, отдых.' },
+              { t: 'Одно действие, которое максимально приблизит меня к цели', id: 'oneAction', type: 'textarea', hint: 'Не список на 38 пунктов. Один шаг, который реально двигает жизнь вперёд.' },
+              { t: 'Что обязательно должно быть сделано сегодня', id: 'mustDo', type: 'textarea', hint: 'Минимум, без которого день будет считаться незавершённым.' },
+              { t: 'Какое решение я принимаю сегодня', id: 'decisionToday', type: 'textarea', hint: 'Например: «я не откладываю звонок», «я выбираю спокойствие», «я делаю сайт до конца».' }
+            ]
+          },
+          {
+            title: 'Забота о себе сегодня',
+            qs: [
+              { t: 'Что я сделала для себя сегодня?', id: 'selfCare', type: 'textarea', hint: 'Вода, прогулка, гимнастика, нормальная еда, отдых, отказ от лишнего стресса — всё считается.' },
+              { t: 'Как я себя после этого чувствую?', id: 'feelings', type: 'check', options: ['спокойно', 'легче', 'радостно', 'увереннее', 'теплее к себе', 'свободнее', 'устала, но довольна'], hint: 'Отметь подходящее. Если чувства другие — допиши ниже.' },
+              { t: 'Другое чувство', id: 'customFeeling', type: 'input', hint: 'Например: «горжусь собой», «пока тревожно, но я стараюсь».' },
+              { t: 'Что я хочу сделать для себя завтра?', id: 'tomorrowCare', type: 'textarea', hint: 'Один заботливый шаг на завтра. Реальный, не героический.' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'goals',
+        title: 'Цели и почему',
+        intro: 'Эта часть нужна, чтобы в трудные дни помнить: зачем начались изменения.',
+        help: 'Зафиксируй «почему», три горизонта целей и глубинную мотивацию — это якорь в сложные дни.',
+        blocks: [
+          {
+            title: 'Почему я больше не хочу жить по-старому?',
+            qs: [
+              { t: 'От чего я устала?', id: 'tiredOf', type: 'textareaBig', hint: 'Пиши честно: напряжение, долги, хаос, откладывание, тревога, усталость, ощущение «я не там».' },
+              { t: 'Что я больше не готова терпеть?', id: 'noLongerTolerate', type: 'textareaBig', hint: 'Например: обесценивание себя, жизнь в режиме выживания, беспорядок, страх проявляться.' },
+              { t: 'Что я хочу оставить в прошлом?', id: 'pastLeave', type: 'textarea', hint: 'Привычки, сценарии, реакции, мысли, люди или способы жить, которые больше не подходят.' },
+              { t: 'Какой я хочу видеть свою жизнь через 3–5 лет?', id: 'lifeVision', type: 'textareaBig', hint: 'Опиши картинкой: где живу, как чувствую себя, какой доход, здоровье, семья, проекты, свобода.' }
+            ]
+          },
+          {
+            title: 'Мои 3 главные цели',
+            qs: [
+              { t: 'Краткосрочная цель — 90 дней', id: 'goal90', type: 'textarea', hint: 'То, что можно реально сдвинуть за 3 месяца: доход, сайт, реклама, здоровье, режим.' },
+              { t: 'Почему эта цель важна?', id: 'why90', type: 'textarea' },
+              { t: 'Среднесрочная цель — 1 год', id: 'goalYear', type: 'textarea', hint: 'Результат, который должен стать новым уровнем жизни.' },
+              { t: 'Почему эта цель важна?', id: 'whyYear', type: 'textarea' },
+              { t: 'Долгосрочная цель — 3–5 лет', id: 'goalLong', type: 'textarea', hint: 'Большая картина: финансовая свобода, здоровье, дом, путешествия, сильные проекты.' },
+              { t: 'Почему эта цель важна?', id: 'whyLong', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Моё почему',
+            qs: [
+              { t: 'Первый уровень: безопасность, долги, спокойствие', id: 'whyLevel1', type: 'textarea', hint: 'Почему мне важно закрыть напряжение и почувствовать опору?' },
+              { t: 'Второй уровень: свобода, выбор, путешествия', id: 'whyLevel2', type: 'textarea', hint: 'Как я хочу жить, когда не нужно постоянно выживать?' },
+              { t: 'Третий уровень: дети, внуки, род', id: 'whyLevel3', type: 'textarea', hint: 'Как мой рост повлияет на семью и будущие поколения?' },
+              { t: 'Четвёртый уровень: польза, помощь, смысл', id: 'whyLevel4', type: 'textarea', hint: 'Что хорошее я хочу создавать для людей, когда мои базовые вопросы закрыты?' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'morning',
+        title: 'Утро',
+        intro: 'Утренний блок помогает включить голову, сердце и действия в одну команду.',
+        help: 'Визуализация, работа с убеждениями и образ лучшей версии себя — настройка на день.',
+        blocks: [
+          {
+            title: 'Визуализация',
+            qs: [
+              { t: 'Что я вижу, когда моя цель уже достигнута?', id: 'visualSee', type: 'textarea', hint: 'Опиши как кадр из фильма: место, люди, цифры, дом, работа, тело, настроение.' },
+              { t: 'Что я чувствую?', id: 'visualFeel', type: 'textarea', hint: 'Спокойствие, радость, свобода, уверенность, благодарность, лёгкость.' },
+              { t: 'Что изменилось в моей жизни?', id: 'visualChanged', type: 'textarea', hint: 'Какие конкретные перемены произошли: доход, здоровье, отношения, режим, дом, проекты.' }
+            ]
+          },
+          {
+            title: 'Работа с убеждениями',
+            qs: [
+              { t: 'Какие ограничивающие мысли я заметила сегодня?', id: 'limitingThoughts', type: 'textareaBig', hint: 'Например: «у меня не получится», «поздно начинать», «клиенты не придут», «я не справлюсь».' },
+              { t: 'Чем я их заменяю?', id: 'replaceThoughts', type: 'textareaBig', hint: 'Перепиши в поддерживающий вариант: «я учусь», «я делаю маленький шаг», «мои навыки ценны».' }
+            ]
+          },
+          {
+            title: 'Моя лучшая версия',
+            qs: [
+              { t: 'Как бы сегодня поступила лучшая версия меня?', id: 'bestVersionAction', type: 'textarea', hint: 'Не идеальная, а взрослая, спокойная и сильная версия.' },
+              { t: 'Что бы она сказала?', id: 'bestVersionWords', type: 'textarea', hint: 'Фраза поддержки, которую тебе важно услышать от себя.' },
+              { t: 'Что бы она перестала терпеть?', id: 'stopTolerating', type: 'textarea', hint: 'То, где пора поставить границу или перестать себя сливать.' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'evening',
+        title: 'Вечер',
+        intro: 'Вечерний блок помогает спокойно подвести итоги и не тащить лишнее в завтра.',
+        help: 'Разбор дня: тело, эмоции, деньги, здоровье, дисциплина и благодарность.',
+        blocks: [
+          {
+            title: 'Ментальный детокс и тело',
+            qs: [
+              { t: 'О чём мне сигнализирует моё тело?', id: 'bodySignal', type: 'textarea', hint: 'Где напряжение, боль, усталость, тревога? Что тело просит заметить?' },
+              { t: 'Что необходимо телу для восстановления?', id: 'bodyNeeds', type: 'textarea', hint: 'Сон, вода, прогулка, дыхание, отдых, правильная еда, тишина, врач, массаж.' },
+              { t: 'Придерживаюсь ли я порядка?', id: 'orderToday', type: 'radio', options: ['да', 'нет', 'частично'], hint: 'Порядок — не стерильность. Это когда вещи и дела не управляют тобой.' },
+              { t: 'Ценю ли я своё время?', id: 'timeValue', type: 'radio', options: ['да', 'нет', 'частично'] },
+              { t: 'Аккуратна ли я сегодня?', id: 'neatToday', type: 'radio', options: ['да', 'нет', 'частично'] },
+              { t: 'Не опаздывала ли я?', id: 'lateToday', type: 'radio', options: ['не опаздывала', 'опаздывала', 'не актуально'] },
+              { t: 'Если опаздывала — почему?', id: 'lateWhy', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Эмоциональная чистота',
+            qs: [
+              { t: 'Что меня сегодня раздражало?', id: 'irritated', type: 'textarea', hint: 'Ситуации, люди, слова, свои реакции. Пиши без цензуры, дневник не обидится.' },
+              { t: 'Почему это меня задело?', id: 'whyHurt', type: 'textarea', hint: 'Что за этим стояло: усталость, страх, несправедливость, ожидания, границы?' },
+              { t: 'Что меня сегодня радовало?', id: 'joyToday', type: 'textarea' },
+              { t: 'Были ли сегодня эти состояния?', id: 'negativePatterns', type: 'check', options: ['осуждение', 'жалобы', 'сплетни', 'самобичевание', 'обесценивание себя', 'зависть', 'сравнение себя с другими', 'негативные разговоры'], hint: 'Галочки нужны не для самобичевания, а чтобы видеть повторяющиеся ловушки.' },
+              { t: 'Если были — что я поняла?', id: 'negativeLesson', type: 'textarea' },
+              { t: 'Забирала ли я негатив других людей?', id: 'tookNegativity', type: 'radio', options: ['да', 'нет', 'частично'] },
+              { t: 'Вовлекалась ли я в чужие конфликты?', id: 'conflicts', type: 'radio', options: ['да', 'нет', 'частично'] },
+              { t: 'Давала ли советы без запроса?', id: 'unsolicitedAdvice', type: 'radio', options: ['да', 'нет', 'не помню'] },
+              { t: 'Если да — экологично ли это было?', id: 'adviceEco', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Отношение к себе',
+            qs: [
+              { t: 'За что я сегодня могу себя уважать?', id: 'respectMyself', type: 'textarea' },
+              { t: 'Где я поддержала себя?', id: 'supportedMyself', type: 'textarea' },
+              { t: 'Где я предала себя?', id: 'betrayedMyself', type: 'textarea', hint: 'Без самобичевания. Просто честно: где промолчала, отложила, переела, согласилась против себя?' },
+              { t: 'Как я могу исправить это завтра?', id: 'fixTomorrow', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Деньги и реализация',
+            qs: [
+              { t: 'Что я сегодня сделала для дохода?', id: 'incomeAction', type: 'textarea', hint: 'Пост, лендинг, реклама, анализ, письмо клиенту, обучение, упаковка услуги.' },
+              { t: 'Что сегодня приблизило меня к финансовой свободе?', id: 'financeCloser', type: 'textarea' },
+              { t: 'Что сегодня отдалило меня от неё?', id: 'financeFarther', type: 'textarea' },
+              { t: 'Какие мои навыки сейчас самые ценные?', id: 'valuableSkills', type: 'textarea', hint: 'Нейросети, визуал, тексты, лендинги, Яндекс Директ, кондитерка, художественный вкус.' },
+              { t: 'Какой следующий шаг я сделаю для увеличения дохода?', id: 'nextIncomeStep', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Здоровье',
+            qs: [
+              { t: 'Сегодня я заботилась о здоровье', id: 'healthHabits', type: 'check', options: ['пила достаточно воды', 'гуляла', 'делала гимнастику', 'занималась дыханием', 'следила за питанием', 'отдыхала', 'рано легла спать'], hint: 'Отметь всё, что было. Маленькие галочки тоже работают на большую жизнь.' },
+              { t: 'Что сегодня улучшило моё здоровье?', id: 'healthBetter', type: 'textarea' },
+              { t: 'Что ухудшило моё здоровье?', id: 'healthWorse', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Ответственность и дисциплина',
+            qs: [
+              { t: 'Где сегодня я была жертвой?', id: 'victimToday', type: 'textarea', hint: 'Где я думала «от меня ничего не зависит»? Это не обвинение, а точка возврата силы.' },
+              { t: 'Где сегодня я была автором своей жизни?', id: 'authorToday', type: 'textarea' },
+              { t: 'Что я могу изменить уже завтра?', id: 'changeTomorrow', type: 'textarea' },
+              { t: 'Что я откладывала?', id: 'procrastinated', type: 'textarea' },
+              { t: 'Почему?', id: 'procrastinatedWhy', type: 'textarea', hint: 'Страх, усталость, непонятно с чего начать, слишком большая задача, нет энергии.' },
+              { t: 'Что я сделаю завтра первым делом?', id: 'firstTomorrow', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Благодарность и итог',
+            qs: [
+              { t: 'Я благодарна себе за', id: 'thanksSelf', type: 'textarea' },
+              { t: 'Я благодарна людям за', id: 'thanksPeople', type: 'textarea' },
+              { t: 'Я благодарна жизни за', id: 'thanksLife', type: 'textarea' },
+              { t: 'Что сегодня получилось?', id: 'workedToday', type: 'textarea' },
+              { t: 'Чему меня научил сегодняшний день?', id: 'lessonToday', type: 'textarea' },
+              { t: 'Что было самым важным открытием?', id: 'insightToday', type: 'textarea' },
+              { t: 'Что я сделала лучше, чем вчера?', id: 'betterThanYesterday', type: 'textarea' },
+              { t: 'Что завтра я сделаю ещё лучше?', id: 'betterTomorrow', type: 'textarea' },
+              { t: 'Если я проживу так ещё один год — куда я приду?', id: 'oneYearPath', type: 'textareaBig' },
+              { t: 'Это именно та жизнь, которую я хочу?', id: 'isDesiredLife', type: 'textarea', hint: 'Ответ может быть честным: да, нет, частично. Главное — что я меняю завтра?' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'audit',
+        title: 'Аудит',
+        intro: 'Еженедельный и ежемесячный разбор: что усиливает, что забирает энергию, где растут деньги и мышление.',
+        help: 'Раз в неделю и раз в месяц — честный разбор прогресса, людей, времени и денег.',
+        blocks: [
+          {
+            title: 'Еженедельный аудит',
+            qs: [
+              { t: 'Что получилось лучше всего?', id: 'weekBest', type: 'textarea' },
+              { t: 'Где был самый большой рост?', id: 'weekGrowth', type: 'textarea' },
+              { t: 'Какие привычки укрепились?', id: 'weekHabits', type: 'textarea' },
+              { t: 'Что мешало больше всего?', id: 'weekBlocked', type: 'textarea' },
+              { t: 'Какие люди усиливали меня?', id: 'weekPeoplePlus', type: 'textarea' },
+              { t: 'Какие люди ослабляли меня?', id: 'weekPeopleMinus', type: 'textarea' },
+              { t: 'Где я потеряла время?', id: 'weekLostTime', type: 'textarea' },
+              { t: 'Где я использовала время мудро?', id: 'weekWiseTime', type: 'textarea' },
+              { t: 'Что принесло деньги?', id: 'weekMoney', type: 'textarea' },
+              { t: 'Что принесло энергию?', id: 'weekEnergyPlus', type: 'textarea' },
+              { t: 'Что забрало энергию?', id: 'weekEnergyMinus', type: 'textarea' },
+              { t: 'Что необходимо изменить на следующей неделе?', id: 'weekChange', type: 'textarea' }
+            ]
+          },
+          {
+            title: 'Ежемесячный аудит',
+            qs: [
+              { t: 'Какие изменения произошли во мне?', id: 'monthChanges', type: 'textarea' },
+              { t: 'Что изменилось в моём здоровье?', id: 'monthHealth', type: 'textarea' },
+              { t: 'Что изменилось в моих доходах?', id: 'monthIncome', type: 'textarea' },
+              { t: 'Что изменилось в моём мышлении?', id: 'monthMind', type: 'textarea' },
+              { t: 'Какие страхи ушли?', id: 'monthFears', type: 'textarea' },
+              { t: 'Какие новые возможности появились?', id: 'monthOpportunities', type: 'textarea' },
+              { t: 'Что я хочу усилить в следующем месяце?', id: 'monthStrengthen', type: 'textarea' },
+              { t: 'Какая версия меня рождается сейчас?', id: 'monthNewVersion', type: 'textarea' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'dreams',
+        title: 'Мечты',
+        intro: 'Мечты без срока давности: они могут прийти не по календарю, но должны жить в сознании.',
+        help: 'Большие мечты, следующий шаг и личный девиз — без давления сроков.',
+        blocks: [
+          {
+            title: 'Мои мечты без срока давности',
+            qs: [
+              { t: 'Мои большие мечты', id: 'bigDreams', type: 'textareaBig', hint: 'Эко-деревня, фонд помощи детям, путешествия, дом в любимой стране, сильный род, полезный проект для тысяч людей.' },
+              { t: 'Если бы у меня уже были дом мечты, деньги, путешествия и пассивный доход — что бы я захотела делать дальше?', id: 'afterEverything', type: 'textareaBig', hint: 'Этот вопрос показывает настоящее «почему», которое начинается за пределами выживания.' },
+              { t: 'Какой один шаг сегодня приближает меня к жизни мечты?', id: 'dreamStep', type: 'textarea', hint: 'Иногда это прогулка вместо сладкого. Иногда — разговор с клиентом. Иногда — публикация поста.' }
+            ]
+          },
+          {
+            title: 'Мой девиз',
+            qs: [
+              { t: 'Мой личный девиз на этот период', id: 'personalMotto', type: 'textarea', placeholder: 'Я не обязана быть идеальной. Я обязана быть честной и последовательной.' }
+            ]
+          }
+        ]
+      },
+      {
+        id: 'habits',
+        title: 'Привычки',
+        intro: 'Отслеживание ежедневных привычек: маленькие повторения создают большую трансформацию.',
+        help: 'Отмечай привычки, которые хочешь закрепить, и фиксируй один шаг на завтра.',
+        blocks: [
+          {
+            title: 'Мои опоры на сегодня',
+            qs: [
+              { t: 'Какие привычки я выполнила сегодня?', id: 'habitsDone', type: 'check', options: ['утренняя зарядка', 'планирование дня', 'чтение', 'медитация / дыхание', 'работа над проектом', 'режим сна', 'здоровое питание', 'прогулка на свежем воздухе'], hint: 'Отметь то, что уже сделала. Не идеал — а реальность.' },
+              { t: 'Какая привычка далась труднее всего?', id: 'habitHard', type: 'textarea', hint: 'Что мешало: усталость, отвлечения, настроение, нехватка времени?' },
+              { t: 'Какую одну привычку я усилю завтра?', id: 'habitTomorrow', type: 'textarea', hint: 'Один фокус лучше, чем десять обещаний.' },
+              { t: 'Награда себе за усилия сегодня', id: 'habitReward', type: 'textarea', hint: 'Небольшая, честная награда — не обязательно покупка. Иногда достаточно отдыха без чувства вины.' }
+            ]
+          }
+        ]
+      },
+      { id: 'archive', title: 'Архив', special: 'archive', help: 'Сохранённые дни, статистика настроения и энергии, экспорт данных.' },
+      { id: 'settings', title: 'Настройки', special: 'settings', help: 'Цветовая палитра, печать, очистка формы и памятка о хранении данных.' }
+    ];
+
+    /* ===== Вспомогательные функции ===== */
+    function allQuestions() {
+      return sections.flatMap(s => (s.blocks || []).flatMap(b => b.qs || []));
+    }
+
+    /* Разделы с вопросами (без архива и настроек) */
+    function getFlowSections() {
+      return sections.filter(s => s.blocks && s.blocks.length);
+    }
+
+    function getSectionQuestions(sectionId) {
+      const section = sections.find(s => s.id === sectionId);
+      if (!section || !section.blocks) return [];
+      return section.blocks.flatMap(b => b.qs || []);
+    }
+
+    function isQuestionFilled(q) {
+      const v = fieldValue(q);
+      if (Array.isArray(v)) return v.length > 0;
+      return String(v || '').trim().length > 0;
+    }
+
+    function getSectionProgress(sectionId) {
+      const qs = getSectionQuestions(sectionId).filter(q => q.type !== 'date');
+      const filled = qs.filter(isQuestionFilled).length;
+      const total = qs.length;
+      return {
+        filled,
+        total,
+        percent: total ? Math.round((filled / total) * 100) : 0
+      };
+    }
+
+    function getNextFlowSection(sectionId) {
+      const flow = getFlowSections();
+      const index = flow.findIndex(s => s.id === sectionId);
+      return index >= 0 && index < flow.length - 1 ? flow[index + 1] : null;
+    }
+
+    function getPrevFlowSection(sectionId) {
+      const flow = getFlowSections();
+      const index = flow.findIndex(s => s.id === sectionId);
+      return index > 0 ? flow[index - 1] : null;
+    }
+
+    function getActiveSectionId() {
+      const active = document.querySelector('.section.active');
+      return active ? active.id : 'today';
+    }
+
+    /* Футер в конце каждой страницы с вопросами */
+    function renderSectionFooter(section) {
+      const next = getNextFlowSection(section.id);
+      const prev = getPrevFlowSection(section.id);
+
+      return `<div class="section-footer card no-print" data-section="${section.id}">
+        <div class="section-footer-top">
+          <span class="section-footer-label">Прогресс этого раздела</span>
+          <span class="section-footer-pct" id="sectionPct-${section.id}">0%</span>
+        </div>
+        <div class="section-footer-bar"><i id="sectionBar-${section.id}"></i></div>
+        <p class="section-footer-note" id="sectionNote-${section.id}">Заполни ответы, чтобы перейти к следующей странице</p>
+        <div class="actions section-footer-actions">
+          ${prev ? `<button class="secondary" type="button" onclick="switchTab('${prev.id}')">← ${esc(prev.title)}</button>` : ''}
+          ${next
+            ? `<button class="primary section-continue-btn" id="continueBtn-${section.id}" type="button" onclick="goToNextSection('${section.id}')">Продолжить → ${esc(next.title)}</button>`
+            : `<button class="primary section-continue-btn" id="continueBtn-${section.id}" type="button" onclick="goToNextSection('${section.id}')">Завершить и перейти в архив</button>`}
+        </div>
+      </div>`;
+    }
+
+    function updateSectionProgress() {
+      getFlowSections().forEach(section => {
+        const { filled, total, percent } = getSectionProgress(section.id);
+        const bar = document.getElementById('sectionBar-' + section.id);
+        const pct = document.getElementById('sectionPct-' + section.id);
+        const note = document.getElementById('sectionNote-' + section.id);
+        const btn = document.getElementById('continueBtn-' + section.id);
+        const footer = document.querySelector(`.section-footer[data-section="${section.id}"]`);
+        const next = getNextFlowSection(section.id);
+        const isComplete = percent === 100;
+
+        if (bar) bar.style.width = percent + '%';
+        if (pct) pct.textContent = percent + '%';
+        if (footer) footer.classList.toggle('complete', isComplete);
+        if (note) {
+          note.textContent = isComplete
+            ? (next ? 'Раздел заполнен — можно переходить дальше!' : 'Все разделы пройдены! Сохрани день или загляни в архив.')
+            : `Отвечено ${filled} из ${total} вопросов — незаполненные подсветятся красным при переходе`;
+        }
+        if (btn) btn.classList.toggle('attention', !isComplete && filled > 0);
+      });
+    }
+
+    /* Подсветка незаполненных вопросов красным */
+    function clearUnfilledHighlights(sectionId) {
+      const scope = sectionId ? document.getElementById(sectionId) : document;
+      if (!scope) return;
+      scope.querySelectorAll('.question.unfilled').forEach(el => el.classList.remove('unfilled'));
+    }
+
+    function highlightUnfilledQuestions(sectionId) {
+      clearUnfilledHighlights(sectionId);
+      const sectionEl = document.getElementById(sectionId);
+      if (!sectionEl) return [];
+
+      const unfilled = getSectionQuestions(sectionId)
+        .filter(q => q.type !== 'date')
+        .filter(q => !isQuestionFilled(q));
+
+      unfilled.forEach(q => {
+        const el = sectionEl.querySelector(`.question[data-qid="${q.id}"]`);
+        if (el) el.classList.add('unfilled');
+      });
+
+      const first = sectionEl.querySelector('.question.unfilled');
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      return unfilled;
+    }
+
+    function refreshUnfilledHighlights(sectionId) {
+      const sectionEl = document.getElementById(sectionId);
+      if (!sectionEl) return;
+
+      getSectionQuestions(sectionId)
+        .filter(q => q.type !== 'date')
+        .forEach(q => {
+          const el = sectionEl.querySelector(`.question[data-qid="${q.id}"]`);
+          if (!el) return;
+          if (isQuestionFilled(q)) el.classList.remove('unfilled');
+        });
+    }
+
+    /* Всплывающее окно при полном заполнении активного раздела */
+    function checkSectionCompletion() {
+      if (suppressContinuePopup) return;
+
+      const activeId = getActiveSectionId();
+      if (!getFlowSections().some(s => s.id === activeId)) return;
+
+      const { percent } = getSectionProgress(activeId);
+
+      if (percent < 100) {
+        shownContinuePopups.delete(activeId);
+        return;
+      }
+
+      if (shownContinuePopups.has(activeId)) return;
+
+      const current = sections.find(s => s.id === activeId);
+      const next = getNextFlowSection(activeId);
+      shownContinuePopups.add(activeId);
+
+      document.getElementById('modal-continue-title').textContent =
+        `Раздел «${current.title}» заполнен!`;
+
+      if (next) {
+        document.getElementById('modal-continue-text').textContent =
+          `Отличная работа! Хочешь продолжить со следующим разделом «${next.title}»?`;
+        document.getElementById('continueNextBtn').textContent = `Продолжить → ${next.title}`;
+        pendingNextSectionId = next.id;
+      } else {
+        document.getElementById('modal-continue-text').textContent =
+          'Ты прошла все разделы дневника! Можно сохранить день или перейти в архив.';
+        document.getElementById('continueNextBtn').textContent = 'Перейти в архив';
+        pendingNextSectionId = 'archive';
+      }
+
+      openModal('continue');
+    }
+
+    function confirmContinueNext() {
+      closeModal('continue');
+      if (pendingNextSectionId) {
+        switchTab(pendingNextSectionId);
+        pendingNextSectionId = null;
+      }
+    }
+
+    function goToNextSection(sectionId) {
+      const id = sectionId || getActiveSectionId();
+      const { percent, total, filled } = getSectionProgress(id);
+      const next = getNextFlowSection(id);
+
+      if (percent < 100) {
+        const missing = highlightUnfilledQuestions(id);
+        const count = missing.length || (total - filled);
+        showAlert(
+          `Перед переходом заполни ${count} ${pluralQuestions(count)} — ${count === 1 ? 'он выделен' : 'они выделены'} красным на странице.`,
+          'Есть незаполненные поля'
+        );
+        return;
+      }
+
+      clearUnfilledHighlights(id);
+      if (next) switchTab(next.id);
+      else switchTab('archive');
+    }
+
+    function pluralQuestions(n) {
+      const mod10 = n % 10;
+      const mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return 'вопрос';
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return 'вопроса';
+      return 'вопросов';
+    }
+
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function fieldValue(q) {
+      const el = document.getElementById(q.id);
+      if (!el && q.type !== 'check' && q.type !== 'radio' && q.type !== 'scale') return '';
+      if (q.type === 'check') return [...document.querySelectorAll(`[name="${q.id}"]:checked`)].map(i => i.value);
+      if (q.type === 'radio' || q.type === 'scale') return document.querySelector(`[name="${q.id}"]:checked`)?.value || '';
+      return el.value || '';
+    }
+
+    function setField(q, val) {
+      if (q.type === 'check') {
+        document.querySelectorAll(`[name="${q.id}"]`).forEach(i => { i.checked = Array.isArray(val) && val.includes(i.value); });
+        return;
+      }
+      if (q.type === 'radio' || q.type === 'scale') {
+        document.querySelectorAll(`[name="${q.id}"]`).forEach(i => { i.checked = i.value === val; });
+        return;
+      }
+      const el = document.getElementById(q.id);
+      if (el) el.value = val || '';
+    }
+
+    /* ===== Всплывающие окна ===== */
+    let confirmCallback = null;
+
+    function openModal(name) {
+      const backdrop = document.getElementById('modal-' + name);
+      if (backdrop) backdrop.classList.add('open');
+    }
+
+    function closeModal(name) {
+      const backdrop = document.getElementById('modal-' + name);
+      if (backdrop) backdrop.classList.remove('open');
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open'));
+    }
+
+    function showHintModal(title, text) {
+      document.getElementById('modal-hint-title').textContent = title;
+      document.getElementById('modal-hint-text').textContent = text;
+      openModal('hint');
+    }
+
+    function showAlert(message, title = 'Сообщение') {
+      document.getElementById('modal-alert-title').textContent = title;
+      document.getElementById('modal-alert-text').textContent = message;
+      openModal('alert');
+    }
+
+    function showConfirm(message, onOk, title = 'Подтверждение') {
+      document.getElementById('modal-confirm-title').textContent = title;
+      document.getElementById('modal-confirm-text').textContent = message;
+      confirmCallback = onOk;
+      openModal('confirm');
+    }
+
+    /* Закрытие модалок по клику на фон и Escape */
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+      backdrop.addEventListener('click', e => {
+        if (e.target === backdrop) closeAllModals();
+      });
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeAllModals();
+    });
+
+    document.getElementById('confirmOk').addEventListener('click', () => {
+      closeModal('confirm');
+      if (typeof confirmCallback === 'function') confirmCallback();
+      confirmCallback = null;
+    });
+
+    document.getElementById('confirmCancel').addEventListener('click', () => {
+      closeModal('confirm');
+      confirmCallback = null;
+    });
+
+    /* ===== Переключение светлой / тёмной темы ===== */
+    function applyMode(mode) {
+      document.body.dataset.mode = mode;
+      const btn = document.getElementById('themeToggle');
+      const isDark = mode === 'dark';
+      btn.textContent = isDark ? '☀️' : '🌙';
+      btn.title = isDark ? 'Включить светлую тему' : 'Включить тёмную тему';
+      btn.setAttribute('aria-label', btn.title);
+      btn.classList.remove('spin');
+      void btn.offsetWidth;
+      btn.classList.add('spin');
+      localStorage.setItem(MODE_KEY, mode);
+    }
+
+    function toggleDarkMode() {
+      const next = document.body.dataset.mode === 'dark' ? 'light' : 'dark';
+      applyMode(next);
+    }
+
+    function applyColor(color) {
+      document.body.dataset.color = color;
+      localStorage.setItem(COLOR_KEY, color);
+    }
+
+    /* ===== Рендер вопросов и разделов ===== */
+    function renderQuestion(q, idx) {
+      const hintBtn = q.hint
+        ? `<button class="hint-btn no-print" type="button" onclick="showHintModal(${JSON.stringify(q.t)}, ${JSON.stringify(q.hint)})">?</button>`
+        : '';
+      const inlineHint = q.hint ? `<p class="hint">${q.hint}</p>` : '';
+      const num = `<span class="q-num">${idx}</span>`;
+      let control = '';
+
+      if (q.type === 'textarea' || q.type === 'textareaBig') {
+        control = `<textarea id="${q.id}" class="${q.type === 'textareaBig' ? 'big' : ''}" placeholder="${q.placeholder || 'Напиши свой ответ здесь...'}"></textarea>`;
+      } else if (q.type === 'input') {
+        control = `<input id="${q.id}" placeholder="${q.placeholder || 'Напиши здесь...'}">`;
+      } else if (q.type === 'date') {
+        control = `<input id="${q.id}" type="date">`;
+      } else if (q.type === 'scale') {
+        control = `<div class="scale" id="${q.id}">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n =>
+          `<label><input type="radio" name="${q.id}" value="${n}"><span>${n}</span></label>`
+        ).join('')}</div>`;
+      } else if (q.type === 'check') {
+        control = `<div class="checks" id="${q.id}">${q.options.map(o =>
+          `<label class="check"><input type="checkbox" name="${q.id}" value="${o}"> ${o}</label>`
+        ).join('')}</div>`;
+      } else if (q.type === 'radio') {
+        control = `<div class="choice" id="${q.id}">${q.options.map(o =>
+          `<label><input type="radio" name="${q.id}" value="${o}"> ${o}</label>`
+        ).join('')}</div>`;
+      }
+
+      return `<div class="question" data-qid="${q.id}">
+        <div class="q-title">${num}<span>${q.t}${hintBtn}</span></div>
+        ${inlineHint}
+        ${control}
+      </div>`;
+    }
+
+    function archiveHTML(s, i) {
+      return `<section id="archive" class="section">
+        <div class="card">
+          <h2>Архив и статистика</h2>
+          <p class="section-intro">Здесь хранятся сохранённые дни. Черновик текущей формы живёт отдельно и обновляется автоматически.</p>
+          <div class="stats">
+            <div class="stat"><b id="statDays">0</b><span>дней сохранено</span></div>
+            <div class="stat"><b id="statAvgMood">—</b><span>среднее настроение</span></div>
+            <div class="stat"><b id="statAvgEnergy">—</b><span>средняя энергия</span></div>
+            <div class="stat"><b id="statIncome">0</b><span>дней с действием для дохода</span></div>
+          </div>
+          <div class="actions no-print">
+            <button class="secondary" type="button" onclick="exportData()">Экспорт JSON</button>
+            <label class="secondary" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;margin:0">
+              Импорт JSON
+              <input class="hidden" type="file" accept="application/json" onchange="importData(event)">
+            </label>
+            <button class="danger" type="button" onclick="deleteAll()">Удалить архив</button>
+          </div>
+          <div id="archiveList"></div>
+        </div>
+      </section>`;
+    }
+
+    function settingsHTML(s, i) {
+      return `<section id="settings" class="section">
+        <div class="card">
+          <h2>Настройки</h2>
+
+          <div class="question">
+            <div class="q-title"><span class="q-num">1</span><span>Цветовая палитра</span></div>
+            <p class="hint">Акцентные цвета интерфейса. Светлая / тёмная тема переключается кнопкой в правом нижнем углу.</p>
+            <div class="checks">
+              <label class="check"><input type="radio" name="color" value="green"> зелёная</label>
+              <label class="check"><input type="radio" name="color" value="rose"> розовая</label>
+              <label class="check"><input type="radio" name="color" value="gold"> золотая</label>
+            </div>
+          </div>
+
+          <div class="question">
+            <div class="q-title"><span class="q-num">2</span><span>Режим отображения</span></div>
+            <div class="checks">
+              <label class="check"><input type="radio" name="mode" value="light"> светлый</label>
+              <label class="check"><input type="radio" name="mode" value="dark"> тёмный</label>
+            </div>
+          </div>
+
+          <h3>Памятка</h3>
+          <p class="note">Все записи сохраняются в браузере на этом устройстве через localStorage. Для надёжности периодически нажимай «Экспорт JSON». Это твоя копия дневника.</p>
+          <div class="quote">Я не обязана быть идеальной. Я обязана быть честной. Я обязана быть последовательной. Маленькие шаги каждый день создают большую жизнь.</div>
+          <div class="actions">
+            <button class="secondary" type="button" onclick="window.print()">Распечатать / сохранить в PDF</button>
+            <button class="secondary" type="button" onclick="clearForm()">Очистить текущую форму</button>
+          </div>
+        </div>
+      </section>`;
+    }
+
+    function renderHelpGrid() {
+      document.getElementById('helpGrid').innerHTML = sections
+        .filter(s => s.help)
+        .map(s => `<div class="help-item"><b>${esc(s.title)}</b><span>${esc(s.help)}</span></div>`)
+        .join('');
+    }
+
+    function render() {
+      document.getElementById('tabs').innerHTML = sections.map((s, i) =>
+        `<button class="tab ${i === 0 ? 'active' : ''}" data-tab="${s.id}" type="button">${s.title}</button>`
+      ).join('');
+
+      document.getElementById('app').innerHTML = sections.map((s, i) => {
+        if (s.special === 'archive') return archiveHTML(s, i);
+        if (s.special === 'settings') return settingsHTML(s, i);
+        const blockCount = s.blocks.length;
+        const questionCount = s.blocks.reduce((sum, b) => sum + b.qs.length, 0);
+        let n = 0;
+        return `<section id="${s.id}" class="section ${i === 0 ? 'active' : ''}">
+          <div class="card section-cover">
+            <div>
+              <p class="eyebrow">Раздел ${i + 1}</p>
+              <h2>${s.title}</h2>
+              <p class="section-intro">${s.intro || ''}</p>
+            </div>
+            <div class="section-meta">
+              <span><b>${blockCount}</b> блока</span>
+              <span><b>${questionCount}</b> вопросов</span>
+              <span>черновик сохраняется автоматически</span>
+            </div>
+          </div>
+          ${s.blocks.map(b => `<div class="card"><h2>${b.title}</h2>${b.qs.map(q => renderQuestion(q, ++n)).join('')}</div>`).join('')}
+          ${renderSectionFooter(s)}
+        </section>`;
+      }).join('');
+
+      document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+      document.querySelectorAll('input, textarea, select').forEach(el => el.addEventListener('input', autoSave));
+      document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.addEventListener('change', autoSave));
+
+      renderHelpGrid();
+      loadDraft();
+      bindThemeSettings();
+      renderArchive();
+      updateProgress();
+      suppressContinuePopup = false;
+      animateSectionEnter('today');
+    }
+
+    /* Плавное появление страницы при первой загрузке */
+    requestAnimationFrame(() => document.body.classList.add('loaded'));
+
+    function bindThemeSettings() {
+      const color = localStorage.getItem(COLOR_KEY) || 'green';
+      const mode = localStorage.getItem(MODE_KEY) || 'light';
+
+      applyColor(color);
+      applyMode(mode);
+
+      document.querySelectorAll('input[name="color"]').forEach(i => {
+        i.checked = i.value === color;
+        i.onchange = () => applyColor(i.value);
+      });
+
+      document.querySelectorAll('input[name="mode"]').forEach(i => {
+        i.checked = i.value === mode;
+        i.onchange = () => applyMode(i.value);
+      });
+    }
+
+    /* ===== Сохранение и загрузка данных ===== */
+    function collect() {
+      const data = { updatedAt: new Date().toISOString() };
+      allQuestions().forEach(q => { data[q.id] = fieldValue(q); });
+      if (!data.date) data.date = todayISO();
+      return data;
+    }
+
+    function fill(data = {}) {
+      allQuestions().forEach(q => setField(q, data[q.id]));
+      const dateEl = document.getElementById('date');
+      if (dateEl && !dateEl.value) dateEl.value = todayISO();
+      updateProgress();
+    }
+
+    function autoSave() {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(collect()));
+      const status = document.getElementById('saveStatus');
+      status.textContent = 'Черновик сохранён';
+      status.classList.remove('saved-flash');
+      void status.offsetWidth;
+      status.classList.add('saved-flash');
+      updateProgress();
+    }
+
+    function loadDraft() {
+      try {
+        const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}');
+        fill(d);
+      } catch {
+        fill({});
+      }
+    }
+
+    function getEntries() {
+      try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function setEntries(e) {
+      localStorage.setItem(STORE_KEY, JSON.stringify(e));
+    }
+
+    function saveDay() {
+      const data = collect();
+      const entries = getEntries();
+      const i = entries.findIndex(e => e.date === data.date);
+      if (i >= 0) entries[i] = data;
+      else entries.unshift(data);
+      entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      setEntries(entries);
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      document.getElementById('saveStatus').textContent = 'День сохранён';
+      const status = document.getElementById('saveStatus');
+      status.classList.remove('saved-flash');
+      void status.offsetWidth;
+      status.classList.add('saved-flash');
+      document.getElementById('modal-saved-text').textContent =
+        `Запись за ${formatDate(data.date)} добавлена в архив. Продолжай маленькими шагами.`;
+      openModal('saved');
+      renderArchive();
+    }
+
+    function clearForm() {
+      showConfirm('Очистить текущую форму? Архивные записи не удалятся.', () => {
+        localStorage.removeItem(DRAFT_KEY);
+        fill({ date: todayISO() });
+        document.getElementById('saveStatus').textContent = 'Форма очищена';
+      }, 'Очистить форму');
+    }
+
+    function animateSectionEnter(id) {
+      const section = document.getElementById(id);
+      if (!section || section.classList.contains('section') === false) return;
+      section.classList.remove('section-enter');
+      void section.offsetWidth;
+      section.classList.add('section-enter');
+    }
+
+    function switchTab(id) {
+      clearUnfilledHighlights();
+      document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === id));
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+      closeModal('continue');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      animateSectionEnter(id);
+      updateSectionProgress();
+    }
+
+    function renderArchive() {
+      const entries = getEntries();
+      const list = document.getElementById('archiveList');
+      if (!list) return;
+
+      document.getElementById('statDays').textContent = entries.length;
+      const avg = a => a.length ? (a.reduce((x, y) => x + y, 0) / a.length).toFixed(1) : '—';
+      document.getElementById('statAvgMood').textContent = avg(entries.map(e => +e.moodScore).filter(Boolean));
+      document.getElementById('statAvgEnergy').textContent = avg(entries.map(e => +e.energyScore).filter(Boolean));
+      document.getElementById('statIncome').textContent = entries.filter(e => (e.incomeAction || '').trim()).length;
+
+      if (!entries.length) {
+        list.innerHTML = '<p class="note">Здесь появится твоя история заботы о себе.</p>';
+        return;
+      }
+
+      list.innerHTML = entries.map(e => `<div class="archive-item">
+        <h3>${esc(formatDate(e.date))}</h3>
+        <p><b>Забота:</b> ${esc(short(e.selfCare || '—'))}</p>
+        <p><b>Шаг к цели:</b> ${esc(short(e.oneAction || e.nextIncomeStep || '—'))}</p>
+        <p class="small">Настроение: ${esc(e.moodScore || '—')} · Энергия: ${esc(e.energyScore || '—')}</p>
+        <div class="actions">
+          <button class="secondary" type="button" onclick="loadEntry('${e.date}')">Открыть</button>
+          <button class="danger" type="button" onclick="deleteEntry('${e.date}')">Удалить</button>
+        </div>
+      </div>`).join('');
+    }
+
+    function loadEntry(date) {
+      const e = getEntries().find(x => x.date === date);
+      if (e) {
+        fill(e);
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(e));
+        switchTab('today');
+      }
+    }
+
+    function deleteEntry(date) {
+      showConfirm('Удалить запись за ' + formatDate(date) + '?', () => {
+        setEntries(getEntries().filter(e => e.date !== date));
+        renderArchive();
+      }, 'Удалить запись');
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(getEntries(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'transformation-journal.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importData(ev) {
+      const file = ev.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try {
+          const data = JSON.parse(r.result);
+          if (!Array.isArray(data)) throw new Error();
+          setEntries(data);
+          renderArchive();
+          showAlert('Архив успешно импортирован.', 'Импорт завершён');
+        } catch {
+          showAlert('Не удалось импортировать файл. Проверь формат JSON.', 'Ошибка импорта');
+        }
+      };
+      r.readAsText(file);
+      ev.target.value = '';
+    }
+
+    function deleteAll() {
+      showConfirm('Удалить весь архив? Это действие нельзя отменить.', () => {
+        localStorage.removeItem(STORE_KEY);
+        renderArchive();
+        showAlert('Архив удалён.', 'Готово');
+      }, 'Удалить архив');
+    }
+
+    function updateProgress() {
+      const qs = allQuestions().filter(q => q.type !== 'date');
+      const filled = qs.filter(q => {
+        const v = fieldValue(q);
+        return Array.isArray(v) ? v.length : String(v || '').trim().length;
+      }).length;
+      const pct = qs.length ? Math.round(filled / qs.length * 100) : 0;
+      const bar = document.getElementById('progressBar');
+      bar.style.width = pct + '%';
+      const progressWrap = bar.parentElement;
+      progressWrap.classList.add('shimmer');
+      clearTimeout(progressWrap._shimmerTimer);
+      progressWrap._shimmerTimer = setTimeout(() => progressWrap.classList.remove('shimmer'), 900);
+      updateSectionProgress();
+      refreshUnfilledHighlights(getActiveSectionId());
+      checkSectionCompletion();
+    }
+
+    function short(t) {
+      return String(t).length > 180 ? String(t).slice(0, 180) + '...' : String(t);
+    }
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatDate(d) {
+      try {
+        return new Date(d + 'T00:00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+      } catch {
+        return d;
+      }
+    }
+
+    /* Миграция старого ключа темы (data-theme → data-color) */
+    (function migrateThemeKey() {
+      const old = localStorage.getItem('irina_success_diary_theme_v2');
+      if (old && !localStorage.getItem(COLOR_KEY)) {
+        localStorage.setItem(COLOR_KEY, old);
+      }
+    })();
+
+    /* Одноразово очищаем только черновик, чтобы шаблон открылся пустым.
+       Архив сохранённых записей остаётся в браузере владельца. */
+    (function clearDraftForCleanTemplate() {
+      if (localStorage.getItem(CLEAN_TEMPLATE_KEY) === 'done') return;
+      localStorage.removeItem(DRAFT_KEY);
+      localStorage.setItem(CLEAN_TEMPLATE_KEY, 'done');
+    })();
+
+    render();
+  </script>
 </body>
 </html>
