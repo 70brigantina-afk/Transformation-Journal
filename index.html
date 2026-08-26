@@ -3,7 +3,13 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#704b36"><meta name="description" content="Персональный центр трансформации на 90 дней">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Трансформация">
   <title>Центр трансформации — 90 дней</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="apple-touch-startup-image" href="splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Prata&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
 </head>
@@ -19,5 +25,5 @@
     <section class="content" id="app" aria-live="polite"></section>
   </main>
   <dialog id="welcomeDialog"><form method="dialog" id="welcomeForm"><p class="eyebrow">Личная настройка</p><h2>С чего начнётся ваша трансформация?</h2><p class="muted">Дневник хранит ответы на этом устройстве. Резервную копию можно скачать в любой момент.</p><label>Как к вам обращаться?<input id="nameInput" maxlength="50" placeholder="Например, Ирина" required></label><label>Главное намерение на 90 дней<textarea id="intentionInput" rows="3" placeholder="Например: стать увереннее и каждый день двигаться к доходу через любимое дело" required></textarea></label><button class="primary" value="start">Начать программу</button></form></dialog>
-  <div class="toast" id="toast" role="status"></div><script src="app.js"></script>
+  <div class="toast" id="toast" role="status"></div><noscript><p class="notice">Для работы дневника включите JavaScript в настройках Safari.</p></noscript><script src="app.js?v=4"></script>
 </body></html>
