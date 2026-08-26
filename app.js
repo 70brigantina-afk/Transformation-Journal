@@ -69,6 +69,12 @@ const defaults={name:'',intention:'',startDate:'',currentDay:1,completed:[],entr
 let restored={};
 try{restored=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch{}
 let state={...defaults,...restored};
+state.completed=Array.isArray(state.completed)?state.completed:[];
+state.entries=state.entries&&typeof state.entries==='object'?state.entries:{};
+state.goals=state.goals&&typeof state.goals==='object'?state.goals:{};
+state.evidence=Array.isArray(state.evidence)?state.evidence:[];
+state.legacyArchive=Array.isArray(state.legacyArchive)?state.legacyArchive:[];
+state.reminders={...defaults.reminders,...(state.reminders||{})};
 // Preserve records created by the previous GitHub version without changing or deleting them.
 if(!state.legacyArchive?.length){
   for(const key of ['irina_success_diary_v2','irina_success_diary_draft_v2']){
@@ -100,4 +106,5 @@ function setView(next){view=next;document.querySelectorAll('.nav-item').forEach(
 document.querySelectorAll('.nav-item').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.getElementById('themeBtn').onclick=()=>{state.theme=state.theme==='dark'?'light':'dark';save()};document.getElementById('exportBtn').onclick=exportBackup;
 const form=document.getElementById('welcomeForm');form.addEventListener('submit',e=>{const name=document.getElementById('nameInput').value.trim(),intention=document.getElementById('intentionInput').value.trim();if(!name||!intention){e.preventDefault();return}state.name=name;state.intention=intention;state.startDate=new Date().toISOString().slice(0,10);save();renderToday()});
 function checkReminders(){if(!state.reminders?.enabled||Notification.permission!=='granted')return;const now=new Date(),hm=now.toTimeString().slice(0,5),date=now.toISOString().slice(0,10),kind=hm===state.reminders.morning?'morning':hm===state.reminders.evening?'evening':'';if(!kind||localStorage.getItem(`transformReminder:${kind}`)===date)return;localStorage.setItem(`transformReminder:${kind}`,date);new Notification(kind==='morning'?'Время утренней трансформации':'Время вечерней трансформации',{body:kind==='morning'?'Благодарность, образ и одно главное действие.':'Успехи, благодарность и честный итог дня.'})}
-updateChrome();renderToday();checkReminders();setInterval(checkReminders,30000);if(!state.name)document.getElementById('welcomeDialog').showModal();
+updateChrome();renderToday();checkReminders();setInterval(checkReminders,30000);if(!state.name){const dlg=document.getElementById('welcomeDialog');if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','')}
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
