@@ -1,4 +1,4 @@
-const CACHE='transformation-journal-v8';
+const CACHE='transformation-journal-v9';
 const ASSETS=['./','./index.html','./styles.css','./app.js?v=8','./manifest.webmanifest','./icon-192.png','./icon-512.png','./splash-750x1334.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
