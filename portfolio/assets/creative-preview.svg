@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+<defs>
+<linearGradient id="a" x1="0" x2="1"><stop stop-color="#10234c"/><stop offset="1" stop-color="#ffb000"/></linearGradient>
+<linearGradient id="b" x1="0" x2="1"><stop stop-color="#7815c8"/><stop offset="1" stop-color="#17c8ff"/></linearGradient>
+<linearGradient id="c" x1="0" x2="1"><stop stop-color="#092b43"/><stop offset="1" stop-color="#f0a51e"/></linearGradient>
+<linearGradient id="d" x1="0" x2="1"><stop stop-color="#071a3b"/><stop offset="1" stop-color="#ff2aa8"/></linearGradient>
+<linearGradient id="e" x1="0" x2="1"><stop stop-color="#0f82d7"/><stop offset="1" stop-color="#7247f0"/></linearGradient>
+<linearGradient id="f" x1="0" x2="1"><stop stop-color="#09616c"/><stop offset="1" stop-color="#9f9f1c"/></linearGradient>
+</defs>
+<rect width="1200" height="720" fill="#f4f6fb"/>
+<g font-family="Arial" fill="white" font-weight="700">
+<g transform="translate(35 35)"><rect width="350" height="300" rx="28" fill="url(#a)"/><text x="28" y="210" font-size="34">AI забирает рутину</text><text x="28" y="248" font-size="18" font-weight="400">эмоция проблемы → решение</text></g>
+<g transform="translate(425 35)"><rect width="350" height="300" rx="28" fill="url(#b)"/><text x="28" y="210" font-size="34">AI-агенты для бизнеса</text><text x="28" y="248" font-size="18" font-weight="400">яркая технологичная подача</text></g>
+<g transform="translate(815 35)"><rect width="350" height="300" rx="28" fill="url(#c)"/><text x="28" y="210" font-size="34">Больше времени</text><text x="28" y="248" font-size="18" font-weight="400">lifestyle и человеческая выгода</text></g>
+<g transform="translate(35 375)"><rect width="350" height="300" rx="28" fill="url(#e)"/><text x="28" y="210" font-size="34">Данные и решения</text><text x="28" y="248" font-size="18" font-weight="400">аналитика, стратегия, контроль</text></g>
+<g transform="translate(425 375)"><rect width="350" height="300" rx="28" fill="url(#d)"/><text x="28" y="210" font-size="34">Практикум без кода</text><text x="28" y="248" font-size="18" font-weight="400">неоновая рекламная серия</text></g>
+<g transform="translate(815 375)"><rect width="350" height="300" rx="28" fill="url(#f)"/><text x="28" y="210" font-size="34">Свобода и результат</text><text x="28" y="248" font-size="18" font-weight="400">вариативность сюжетов кампании</text></g>
+</g></svg>
