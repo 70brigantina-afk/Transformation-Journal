@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+<defs><linearGradient id="bg" x1="0" x2="1"><stop stop-color="#f7f3ec"/><stop offset="1" stop-color="#eee8de"/></linearGradient></defs>
+<rect width="1200" height="675" fill="url(#bg)"/>
+<rect x="42" y="36" width="1116" height="603" rx="30" fill="#fffdf9" stroke="#d8d1c7"/>
+<text x="86" y="96" font-family="Georgia,serif" font-size="34" fill="#314b42">Анастасия Сафарова</text>
+<text x="86" y="128" font-family="Arial,sans-serif" font-size="17" fill="#7d807b">ПСИХОЛОГ-КОНСУЛЬТАНТ ДЛЯ ЖЕНЩИН</text>
+<line x1="86" y1="156" x2="1112" y2="156" stroke="#ddd7ce"/>
+<text x="86" y="252" font-family="Georgia,serif" font-size="52" fill="#344a43">Когда тревога не отпускает,</text>
+<text x="86" y="315" font-family="Georgia,serif" font-size="52" fill="#344a43">можно спокойно разобраться,</text>
+<text x="86" y="378" font-family="Georgia,serif" font-size="52" fill="#344a43">что происходит</text>
+<text x="86" y="430" font-family="Arial,sans-serif" font-size="22" fill="#626964">Структура • тексты • визуал • путь пользователя • запись</text>
+<rect x="86" y="482" width="315" height="66" rx="33" fill="#405f56"/>
+<text x="243" y="523" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="white">Записаться</text>
+<rect x="780" y="198" width="300" height="330" rx="34" fill="#e9e0d5"/>
+<circle cx="930" cy="310" r="72" fill="#d7c8b8"/>
+<path d="M860 455c18-88 122-88 140 0" fill="#c3b4a3"/>
+<rect x="814" y="558" width="232" height="16" rx="8" fill="#ded5ca"/>
+</svg>
